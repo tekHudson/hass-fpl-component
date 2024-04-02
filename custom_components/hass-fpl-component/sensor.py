@@ -1,4 +1,4 @@
-"""Sensor platform for integration_blueprint."""
+"""Sensor platform for custom_components/hass-fpl-component."""
 
 from .sensor_KWHSensor import (
     ProjectedKWHSensor,

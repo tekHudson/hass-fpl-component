@@ -17,7 +17,7 @@ REQUIRED_FILES = [
     "manifest.json",
     "sensor.py",
 ]
-ISSUE_URL = "https://github.com/dotKrad/hass-fpl/issues"
+ISSUE_URL = "https://github.com/tekHudson/hass-fpl-component/issues"
 ATTRIBUTION = "Data provided by FPL."
 
 # Platforms
