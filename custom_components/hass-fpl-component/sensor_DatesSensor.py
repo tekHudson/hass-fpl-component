@@ -1,11 +1,11 @@
-"""dates sensors"""
+"""dates sensors."""
 import datetime
 from homeassistant.components.sensor import SensorStateClass
 from .fplEntity import FplDateEntity, FplDayEntity
 
 
 class CurrentBillDateSensor(FplDateEntity):
-    """Current bill date sensor"""
+    """Current bill date sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Current Bill Date")
@@ -21,7 +21,7 @@ class CurrentBillDateSensor(FplDateEntity):
 
 
 class NextBillDateSensor(FplDateEntity):
-    """Next bill date sensor"""
+    """Next bill date sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Next Bill Date")
@@ -37,7 +37,7 @@ class NextBillDateSensor(FplDateEntity):
 
 
 class ServiceDaysSensor(FplDayEntity):
-    """Service days sensor"""
+    """Service days sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Service Days")
@@ -55,7 +55,7 @@ class ServiceDaysSensor(FplDayEntity):
 
 
 class AsOfDaysSensor(FplDayEntity):
-    """As of days sensor"""
+    """As of days sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "As Of Days")
@@ -71,7 +71,7 @@ class AsOfDaysSensor(FplDayEntity):
 
 
 class RemainingDaysSensor(FplDayEntity):
-    """Remaining days sensor"""
+    """Remaining days sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Remaining Days")

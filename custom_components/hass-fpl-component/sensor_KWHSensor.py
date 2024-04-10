@@ -1,4 +1,4 @@
-"""energy sensors"""
+"""energy sensors."""
 from datetime import date, timedelta
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -8,7 +8,7 @@ from .fplEntity import FplEnergyEntity
 
 
 class ProjectedKWHSensor(FplEnergyEntity):
-    """Projected KWH sensor"""
+    """Projected KWH sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Projected KWH")
@@ -30,7 +30,7 @@ class ProjectedKWHSensor(FplEnergyEntity):
 
 
 class DailyAverageKWHSensor(FplEnergyEntity):
-    """Daily Average KWH sensor"""
+    """Daily Average KWH sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Daily Average KWH")
@@ -52,7 +52,7 @@ class DailyAverageKWHSensor(FplEnergyEntity):
 
 
 class BillToDateKWHSensor(FplEnergyEntity):
-    """Bill To Date KWH sensor"""
+    """Bill To Date KWH sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Bill To Date KWH")
@@ -73,7 +73,7 @@ class BillToDateKWHSensor(FplEnergyEntity):
 
 
 class NetReceivedKWHSensor(FplEnergyEntity):
-    """Received Meter Reading KWH sensor"""
+    """Received Meter Reading KWH sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Received Meter Reading KWH")
@@ -95,7 +95,7 @@ class NetReceivedKWHSensor(FplEnergyEntity):
 
 
 class NetDeliveredKWHSensor(FplEnergyEntity):
-    """Delivered Meter Reading KWH sensor"""
+    """Delivered Meter Reading KWH sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Delivered Meter Reading KWH")

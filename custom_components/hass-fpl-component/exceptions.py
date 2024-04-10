@@ -1,12 +1,12 @@
-"""exceptions file"""
+"""exceptions file."""
 
 
 class WarrantException(Exception):
-    """Base class for all Warrant exceptions"""
+    """Base class for all Warrant exceptions."""
 
 
 class ForceChangePasswordException(WarrantException):
-    """Raised when the user is forced to change their password"""
+    """Raised when the user is forced to change their password."""
 
 
 class TokenVerificationException(WarrantException):
@@ -14,4 +14,4 @@ class TokenVerificationException(WarrantException):
 
 
 class NoTerrytoryAvailableException(Exception):
-    """Thrown when not possible to determine user territory"""
+    """Thrown when not possible to determine user territory."""

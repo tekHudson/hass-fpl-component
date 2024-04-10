@@ -1,4 +1,4 @@
-"""FPL Northwest data collection api client"""
+"""FPL Northwest data collection api client."""
 from datetime import datetime, timedelta
 import logging
 import async_timeout
@@ -17,7 +17,7 @@ _LOGGER = logging.getLogger(__package__)
 
 
 class FplNorthwestRegionApiClient:
-    """FPL Northwest Api client"""
+    """FPL Northwest Api client."""
 
     def __init__(self, username, password, loop, session) -> None:
         self.session = session
@@ -29,7 +29,7 @@ class FplNorthwestRegionApiClient:
         self.refresh_token = None
 
     async def login(self):
-        """login using aws"""
+        """login using aws."""
         client = await self.loop.run_in_executor(
             None, boto3.client, "cognito-idp", "us-east-1"
         )
@@ -117,7 +117,7 @@ class FplNorthwestRegionApiClient:
         return result
 
     async def logout(self):
-        """log out from fpl"""
+        """log out from fpl."""
 
     async def update(self, account):
         """

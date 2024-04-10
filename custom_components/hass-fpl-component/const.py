@@ -33,7 +33,7 @@ BINARY_SENSOR_DEVICE_CLASS = "connectivity"
 DEFAULT_NAME = DOMAIN
 
 
-STARTUP_MESSAGE = f"""
+STARTUP_MESSAGE = f."""
 -------------------------------------------------------------------
 {NAME}
 Version: {VERSION}

@@ -1,4 +1,4 @@
-"""Daily Usage Sensors"""
+"""Daily Usage Sensors."""
 from datetime import timedelta, datetime
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -8,7 +8,7 @@ from .fplEntity import FplEnergyEntity, FplMoneyEntity
 
 
 class FplDailyUsageSensor(FplMoneyEntity):
-    """Daily Usage Cost Sensor"""
+    """Daily Usage Cost Sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Daily Usage")
@@ -34,7 +34,7 @@ class FplDailyUsageSensor(FplMoneyEntity):
 
 
 class FplDailyUsageKWHSensor(FplEnergyEntity):
-    """Daily Usage Kwh Sensor"""
+    """Daily Usage Kwh Sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Daily Usage KWH")
@@ -76,7 +76,7 @@ class FplDailyUsageKWHSensor(FplEnergyEntity):
 
 
 class FplDailyReceivedKWHSensor(FplEnergyEntity):
-    """daily received Kwh sensor"""
+    """daily received Kwh sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Daily Received KWH")
@@ -106,7 +106,7 @@ class FplDailyReceivedKWHSensor(FplEnergyEntity):
 
 
 class FplDailyDeliveredKWHSensor(FplEnergyEntity):
-    """daily delivered Kwh sensor"""
+    """daily delivered Kwh sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL_INCREASING
 

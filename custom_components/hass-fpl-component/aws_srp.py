@@ -1,4 +1,4 @@
-"""AWS SRP"""
+"""AWS SRP."""
 import os
 import base64
 import binascii
@@ -38,7 +38,7 @@ info_bits = bytearray("Caldera Derived Key", "utf-8")
 
 
 def hash_sha256(buf):
-    """AuthenticationHelper.hash"""
+    """AuthenticationHelper.hash."""
     a = hashlib.sha256(buf).hexdigest()
     return (64 - len(a)) * "0" + a
 
@@ -246,7 +246,7 @@ class AWSSRP(object):
         return response
 
     async def authenticate_user(self, client=None):
-        """authenticate user"""
+        """authenticate user."""
         boto_client = self.client or client
         auth_params = self.get_auth_params()
 

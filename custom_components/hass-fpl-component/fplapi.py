@@ -1,4 +1,4 @@
-"""Custom FPl api client"""
+"""Custom FPl api client."""
 import sys
 import json
 import logging
@@ -41,7 +41,7 @@ class FplApi:
         self.apiClient = None
 
     async def getTerritory(self):
-        """get territory"""
+        """get territory."""
         _LOGGER.debug("Getting territory")
         if self._territory is not None:
             return self._territory
@@ -61,11 +61,11 @@ class FplApi:
             return territoryArray[0]
 
     def isMainRegion(self):
-        """Returns true if this account belongs to the main region, not northwest"""
+        """Returns true if this account belongs to the main region, not northwest."""
         return self._territory == FPL_MAINREGION
 
     async def initialize(self):
-        """initialize the api client"""
+        """initialize the api client."""
         self._territory = await self.getTerritory()
 
         # set the api client based on user's territory
@@ -80,7 +80,7 @@ class FplApi:
                 )
 
     async def get_basic_info(self):
-        """returns basic info for sensor initialization"""
+        """returns basic info for sensor initialization."""
         await self.initialize()
         data = {}
         data[CONF_TERRITORY] = self._territory
@@ -89,7 +89,7 @@ class FplApi:
         return data
 
     async def async_get_data(self) -> dict:
-        """Get data from fpl api"""
+        """Get data from fpl api."""
         await self.initialize()
         data = {}
         data[CONF_ACCOUNTS] = []
@@ -109,7 +109,7 @@ class FplApi:
         return data
 
     async def login(self):
-        """method to use in config flow"""
+        """method to use in config flow."""
         try:
             await self.initialize()
 
@@ -123,10 +123,10 @@ class FplApi:
             return LOGIN_RESULT_FAILURE
 
     async def async_get_open_accounts(self):
-        """return open accounts"""
+        """return open accounts."""
         self.initialize()
         return await self.apiClient.get_open_accounts()
 
     async def logout(self):
-        """log out from fpl"""
+        """log out from fpl."""
         return await self.apiClient.logout()

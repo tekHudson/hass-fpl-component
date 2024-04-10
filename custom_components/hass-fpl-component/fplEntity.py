@@ -1,4 +1,4 @@
-"""Fpl Entity class"""
+"""Fpl Entity class."""
 
 from datetime import datetime, timedelta
 
@@ -13,7 +13,7 @@ from .const import DOMAIN, VERSION, ATTRIBUTION
 
 
 class FplEntity(CoordinatorEntity, SensorEntity):
-    """FPL base entity"""
+    """FPL base entity."""
 
     _attr_attribution = ATTRIBUTION
 
@@ -43,7 +43,7 @@ class FplEntity(CoordinatorEntity, SensorEntity):
         }
 
     def customAttributes(self) -> dict:
-        """override this method to set custom attributes"""
+        """override this method to set custom attributes."""
         return {}
 
     @property
@@ -57,7 +57,7 @@ class FplEntity(CoordinatorEntity, SensorEntity):
         return attributes
 
     def getData(self, field):
-        """call this method to retrieve sensor data"""
+        """call this method to retrieve sensor data."""
         if self.coordinator.data is not None:
             account = self.coordinator.data.get(self.account)
             if account is not None:
@@ -66,7 +66,7 @@ class FplEntity(CoordinatorEntity, SensorEntity):
 
 
 class FplEnergyEntity(FplEntity):
-    """Represents a energy sensor"""
+    """Represents a energy sensor."""
 
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
     # _attr_device_class = SensorDeviceClass.ENERGY
@@ -82,7 +82,7 @@ class FplEnergyEntity(FplEntity):
 
 
 class FplMoneyEntity(FplEntity):
-    """Represents a money sensor"""
+    """Represents a money sensor."""
 
     _attr_native_unit_of_measurement = CURRENCY_DOLLAR
     _attr_device_class = SensorDeviceClass.MONETARY
@@ -90,13 +90,13 @@ class FplMoneyEntity(FplEntity):
 
 
 class FplDateEntity(FplEntity):
-    """Represents a date or days"""
+    """Represents a date or days."""
 
     _attr_icon = "mdi:calendar"
 
 
 class FplDayEntity(FplEntity):
-    """Represents a date or days"""
+    """Represents a date or days."""
 
     _attr_native_unit_of_measurement = "days"
     _attr_icon = "mdi:calendar"

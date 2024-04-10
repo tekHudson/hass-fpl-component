@@ -1,4 +1,4 @@
-"""Data Update Coordinator"""
+"""Data Update Coordinator."""
 import logging
 from datetime import timedelta
 

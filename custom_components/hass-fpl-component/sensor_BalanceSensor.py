@@ -1,9 +1,9 @@
-"""Balance sensors"""
+"""Balance sensors."""
 from .fplEntity import FplMoneyEntity
 
 
 class BalanceSensor(FplMoneyEntity):
-    """balance sensor"""
+    """balance sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Balance Due")

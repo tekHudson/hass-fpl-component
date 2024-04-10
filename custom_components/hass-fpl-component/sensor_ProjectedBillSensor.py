@@ -1,11 +1,11 @@
-"""Projected bill sensors"""
+"""Projected bill sensors."""
 # from homeassistant.components.sensor import SensorStateClass.TOTAL
 
 from .fplEntity import FplMoneyEntity
 
 
 class FplProjectedBillSensor(FplMoneyEntity):
-    """Projected bill sensor"""
+    """Projected bill sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL
 
@@ -36,7 +36,7 @@ class FplProjectedBillSensor(FplMoneyEntity):
 
 # Defered Amount
 class DeferedAmountSensor(FplMoneyEntity):
-    """Defered amount sensor"""
+    """Defered amount sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL
 
@@ -55,7 +55,7 @@ class DeferedAmountSensor(FplMoneyEntity):
 
 
 class ProjectedBudgetBillSensor(FplMoneyEntity):
-    """projected budget bill sensor"""
+    """projected budget bill sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL
 
@@ -73,7 +73,7 @@ class ProjectedBudgetBillSensor(FplMoneyEntity):
 
 
 class ProjectedActualBillSensor(FplMoneyEntity):
-    """projeted actual bill sensor"""
+    """projeted actual bill sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL
 
@@ -91,7 +91,7 @@ class ProjectedActualBillSensor(FplMoneyEntity):
 
 
 class BillToDateSensor(FplMoneyEntity):
-    """projeted actual bill sensor"""
+    """projeted actual bill sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL
 

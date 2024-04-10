@@ -1,4 +1,4 @@
-"""Home Assistant Fpl integration Config Flow"""
+"""Home Assistant Fpl integration Config Flow."""
 from collections import OrderedDict
 
 import voluptuous as vol
@@ -39,7 +39,7 @@ def configured_instances(hass):
 
 
 class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Fpl Config Flow Handler"""
+    """Fpl Config Flow Handler."""
 
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL

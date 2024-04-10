@@ -1,4 +1,4 @@
-"""FPL Main region data collection api client"""
+"""FPL Main region data collection api client."""
 
 import json
 import logging
@@ -46,7 +46,7 @@ _LOGGER = logging.getLogger(__package__)
 
 
 class FplMainRegionApiClient:
-    """Fpl Main Region Api Client"""
+    """Fpl Main Region Api Client."""
 
     def __init__(self, username, password, loop, session) -> None:
         self.session = session
@@ -55,7 +55,7 @@ class FplMainRegionApiClient:
         self.loop = loop
 
     async def login(self):
-        """login into fpl"""
+        """login into fpl."""
 
         # login and get account information
 
@@ -100,7 +100,7 @@ class FplMainRegionApiClient:
         return result
 
     async def logout(self):
-        """Logging out from fpl"""
+        """Logging out from fpl."""
         _LOGGER.info("Logging out")
 
         URL_LOGOUT = API_HOST + "/api/resources/logout"
@@ -111,7 +111,7 @@ class FplMainRegionApiClient:
             _LOGGER.error(e)
 
     async def update(self, account) -> dict:
-        """Get data from resources endpoint"""
+        """Get data from resources endpoint."""
         data = {}
 
         URL_RESOURCES_ACCOUNT = API_HOST + "/api/resources/account/{account}"
@@ -191,7 +191,7 @@ class FplMainRegionApiClient:
         return data
 
     async def __getFromProjectedBill(self, account, premise, currentBillDate) -> dict:
-        """get data from projected bill endpoint"""
+        """get data from projected bill endpoint."""
         data = {}
 
         try:
@@ -223,7 +223,7 @@ class FplMainRegionApiClient:
         return data
 
     async def __getBBL_async(self, account, projectedBillData) -> dict:
-        """Get budget billing data"""
+        """Get budget billing data."""
         _LOGGER.info("Getting budget billing data")
         data = {}
 
@@ -366,7 +366,7 @@ class FplMainRegionApiClient:
         return data
 
     async def __getDataFromApplianceUsage(self, account, lastBilledDate) -> dict:
-        """get data from appliance usage"""
+        """get data from appliance usage."""
         _LOGGER.info("Getting appliance usage data")
 
         JSON = {"startDate": str(lastBilledDate.strftime("%m%d%Y"))}
@@ -394,7 +394,7 @@ class FplMainRegionApiClient:
         return {"energy_percent_by_applicance": data}
 
     async def __getDataFromBalance(self, account) -> dict:
-        """get data from appliance usage"""
+        """get data from appliance usage."""
         _LOGGER.info("Getting appliance usage data")
 
         data = {}

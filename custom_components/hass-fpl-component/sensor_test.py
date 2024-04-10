@@ -1,4 +1,4 @@
-"""Test Sensors"""
+"""Test Sensors."""
 from datetime import timedelta, datetime
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -10,7 +10,7 @@ from .fplEntity import FplEnergyEntity
 
 
 class TestSensor(FplEnergyEntity):
-    """Daily Usage Kwh Sensor"""
+    """Daily Usage Kwh Sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Test Sensor")
