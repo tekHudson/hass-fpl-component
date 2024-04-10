@@ -8,6 +8,7 @@ class CurrentBillDateSensor(FplDateEntity):
     """Current bill date sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Current Bill Date")
 
     @property

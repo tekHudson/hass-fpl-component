@@ -115,6 +115,7 @@ class AWSSRP:
         client_secret=None,
         loop=None,
     ):
+        """Initialize the class."""
         if pool_region is not None and client is not None:
             raise ValueError(
                 "pool_region and client should not both be specified "

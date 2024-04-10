@@ -45,7 +45,7 @@ class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
     def __init__(self):
-        """Initialize."""
+        """Initialize the class."""
         self._errors = {}
 
     async def async_step_user(

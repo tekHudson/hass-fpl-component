@@ -10,6 +10,7 @@ class ProjectedKWHSensor(FplEnergyEntity):
     """Projected KWH sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Projected KWH")
 
     @property

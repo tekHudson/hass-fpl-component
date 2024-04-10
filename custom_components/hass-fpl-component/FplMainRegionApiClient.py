@@ -49,6 +49,7 @@ class FplMainRegionApiClient:
     """Fpl Main Region Api Client."""
 
     def __init__(self, username, password, loop, session) -> None:
+        """Initialize the class."""
         self.session = session
         self.username = username
         self.password = password

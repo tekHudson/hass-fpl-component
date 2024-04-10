@@ -11,6 +11,7 @@ class FplDailyUsageSensor(FplMoneyEntity):
     """Daily Usage Cost Sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Daily Usage")
 
     @property

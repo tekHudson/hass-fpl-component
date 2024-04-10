@@ -18,6 +18,7 @@ class FplEntity(CoordinatorEntity, SensorEntity):
     _attr_attribution = ATTRIBUTION
 
     def __init__(self, coordinator, config_entry, account, sensorName):
+        """Initialize the class."""
         super().__init__(coordinator)
         self.config_entry = config_entry
         self.account = account

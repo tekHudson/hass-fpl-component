@@ -4,6 +4,7 @@ import pprint
 
 class TestSensor(FplEntity):
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Test Sensor")
 
     @property

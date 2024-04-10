@@ -10,6 +10,7 @@ class FplProjectedBillSensor(FplMoneyEntity):
     # _attr_state_class = SensorStateClass.TOTAL
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Projected Bill")
 
     @property

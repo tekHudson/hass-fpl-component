@@ -18,7 +18,7 @@ class FplDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     def __init__(self, hass: HomeAssistant, client: FplApi) -> None:
-        """Initialize."""
+        """Initialize the class."""
         self.api = client
         self.platforms = []
 

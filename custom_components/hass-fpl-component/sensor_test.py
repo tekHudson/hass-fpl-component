@@ -12,6 +12,7 @@ class TestSensor(FplEnergyEntity):
     """Daily Usage Kwh Sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Test Sensor")
 
     _attr_state_class = SensorStateClass.TOTAL_INCREASING

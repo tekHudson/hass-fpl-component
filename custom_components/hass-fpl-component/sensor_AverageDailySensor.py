@@ -6,6 +6,7 @@ class DailyAverageSensor(FplMoneyEntity):
     """Average daily sensor, use budget value if available, otherwise use actual daily values."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Daily Average")
 
     @property
