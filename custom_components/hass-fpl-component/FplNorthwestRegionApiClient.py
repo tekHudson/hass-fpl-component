@@ -96,8 +96,7 @@ class FplNorthwestRegionApiClient:
             return LOGIN_RESULT_OK
 
     async def get_open_accounts(self):
-        """Returns the open accounts
-        """
+        """Return the open accounts."""
 
         result = []
         URL = API_HOST + "/cs/gulf/ssp/v1/profile/accounts/list"
@@ -117,11 +116,10 @@ class FplNorthwestRegionApiClient:
         return result
 
     async def logout(self):
-        """Log out from fpl."""
+        """Log out from FPL."""
 
     async def update(self, account):
-        """Returns the data collected from fpl
-        """
+        """Return the data collected from FPL."""
 
         URL = (
             API_HOST

@@ -11,6 +11,7 @@ class DailyAverageSensor(FplMoneyEntity):
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         daily_avg = self.getData("daily_avg")
 
         if daily_avg is not None:
@@ -29,10 +30,12 @@ class BudgetDailyAverageSensor(FplMoneyEntity):
     """Budget daily average sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Budget Daily Average")
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         budget_billing_daily_avg = self.getData("budget_billing_daily_avg")
 
         if budget_billing_daily_avg is not None:
@@ -51,10 +54,12 @@ class ActualDailyAverageSensor(FplMoneyEntity):
     """Actual daily average sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Actual Daily Average")
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         daily_avg = self.getData("daily_avg")
 
         if daily_avg is not None:

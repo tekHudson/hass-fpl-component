@@ -1,6 +1,7 @@
 """Home Assistant Fpl integration Config Flow."""
 from collections import OrderedDict
 
+import contextlib
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -12,8 +13,6 @@ from homeassistant.const import CONF_USERNAME, CONF_PASSWORD, CONF_NAME
 from .const import (
     CONF_ACCOUNTS,
     CONF_TERRITORY,
-    DEFAULT_CONF_PASSWORD,
-    DEFAULT_CONF_USERNAME,
     DOMAIN,
     LOGIN_RESULT_OK,
     LOGIN_RESULT_FAILURE,
@@ -23,10 +22,8 @@ from .const import (
 
 from .fplapi import FplApi
 
-try:
+with contextlib.suppress(Exception):
     from .secrets import DEFAULT_CONF_PASSWORD, DEFAULT_CONF_USERNAME
-except:
-    pass
 
 
 @callback
@@ -100,8 +97,8 @@ class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _show_config_form(self, user_input):
         """Show the configuration form to edit location data."""
-        username = DEFAULT_CONF_USERNAME
-        password = DEFAULT_CONF_PASSWORD
+        username = DEFAULT_CONF_USERNAME or ""
+        password = DEFAULT_CONF_PASSWORD or ""
 
         if user_input is not None:
             if CONF_USERNAME in user_input:
@@ -119,6 +116,7 @@ class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_import(self, user_input):  # pylint: disable=unused-argument
         """Import a config entry.
+
         Special type of import, we're not actually going to store any data.
         Instead, we're going to rely on the values that are in config file.
         """

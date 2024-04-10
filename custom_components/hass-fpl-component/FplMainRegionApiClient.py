@@ -81,10 +81,7 @@ class FplMainRegionApiClient:
         return LOGIN_RESULT_FAILURE
 
     async def get_open_accounts(self):
-        """Get open accounts
-
-        Returns array with active account numbers
-        """
+        """Get open accounts. Returns array with active account numbers."""
         result = []
         URL = API_HOST + "/api/resources/header"
         async with async_timeout.timeout(TIMEOUT):
@@ -100,7 +97,7 @@ class FplMainRegionApiClient:
         return result
 
     async def logout(self):
-        """Logging out from fpl."""
+        """Log out from FPL."""
         _LOGGER.info("Logging out")
 
         URL_LOGOUT = API_HOST + "/api/resources/logout"
@@ -155,10 +152,10 @@ class FplMainRegionApiClient:
         # programs
         programsData = account_data["programs"]["data"]
 
-        programs = dict()
+        programs = []
         _LOGGER.info("Getting Programs")
         for program in programsData:
-            if "enrollmentStatus" in program.keys():
+            if "enrollmentStatus" in program:
                 key = program["name"]
                 programs[key] = program["enrollmentStatus"] == ENROLLED
 
@@ -306,7 +303,7 @@ class FplMainRegionApiClient:
                 )
                 if response.status == 200:
                     rd = await response.json()
-                    if "data" not in rd.keys():
+                    if "data" not in rd:
                         return []
 
                     r = rd["data"]
@@ -314,7 +311,7 @@ class FplMainRegionApiClient:
 
                     # totalPowerUsage = 0
                     if (
-                        "data" in rd.keys()
+                        "data" in rd
                         and "DailyUsage" in rd["data"]
                         and "data" in rd["data"]["DailyUsage"]
                     ):
@@ -323,24 +320,12 @@ class FplMainRegionApiClient:
                             if daily["missingDay"] != "true":
                                 dailyUsage.append(
                                     {
-                                        "usage": daily["kwhUsed"]
-                                        if "kwhUsed" in daily.keys()
-                                        else None,
-                                        "cost": daily["billingCharge"]
-                                        if "billingCharge" in daily.keys()
-                                        else None,
+                                        "usage": daily.get("kwhUsed", None),
+                                        "cost": daily.get("billingCharge", None),
                                         # "date": daily["date"],
-                                        "max_temperature": daily[
-                                            "averageHighTemperature"
-                                        ]
-                                        if "averageHighTemperature" in daily.keys()
-                                        else None,
-                                        "netDeliveredKwh": daily["netDeliveredKwh"]
-                                        if "netDeliveredKwh" in daily.keys()
-                                        else 0,
-                                        "netReceivedKwh": daily["netReceivedKwh"]
-                                        if "netReceivedKwh" in daily.keys()
-                                        else 0,
+                                        "max_temperature": daily.get("averageHighTemperature", None),
+                                        "netDeliveredKwh": daily.get("netDeliveredKwh", 0),
+                                        "netReceivedKwh": daily.get("netReceivedKwh", 0),
                                         "readTime": datetime.fromisoformat(
                                             daily[
                                                 "readTime"
@@ -407,11 +392,11 @@ class FplMainRegionApiClient:
                 if response.status == 200:
                     data = (await response.json())["data"]
 
-                    indice = [i for i, x in enumerate(data) if x["details"] == "DEBT"][
-                        0
-                    ]
+                    # indice = [i for i, x in enumerate(data) if x["details"] == "DEBT"][
+                    #     0
+                    # ]
 
-                    deb = data[indice]["amount"]
+                    # deb = data[indice]["amount"]
 
         except Exception as e:
             _LOGGER.error(e)

@@ -61,7 +61,8 @@ class FplApi:
             return territoryArray[0]
 
     def isMainRegion(self):
-        """Returns true if this account belongs to the main region, not northwest."""
+        """Return true if this account belongs to the main region, not northwest."""
+
         return self._territory == FPL_MAINREGION
 
     async def initialize(self):
@@ -80,7 +81,7 @@ class FplApi:
                 )
 
     async def get_basic_info(self):
-        """Returns basic info for sensor initialization."""
+        """Return basic info for sensor initialization."""
         await self.initialize()
         data = {}
         data[CONF_TERRITORY] = self._territory
@@ -109,7 +110,7 @@ class FplApi:
         return data
 
     async def login(self):
-        """Method to use in config flow."""
+        """Login to the api."""
         try:
             await self.initialize()
 

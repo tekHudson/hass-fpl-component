@@ -91,7 +91,7 @@ registerSensor(BalanceSensor, ONLY_MAINREGION)
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
-    """Setup sensor platform."""
+    """Set up sensor platform."""
 
     accounts = entry.data.get(CONF_ACCOUNTS)
     territory = entry.data.get(CONF_TERRITORY)

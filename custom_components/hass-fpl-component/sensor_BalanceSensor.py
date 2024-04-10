@@ -11,11 +11,12 @@ class BalanceSensor(FplMoneyEntity):
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         data = self.getData("balance_data")
 
         self._attr_native_value = 0
 
-        if data is not None and len(data) > 0 and "amount" in data[0].keys():
+        if data is not None and len(data) > 0 and "amount" in data[0]:
             self._attr_native_value = data[0]["amount"]
 
         return self._attr_native_value
@@ -26,9 +27,9 @@ class BalanceSensor(FplMoneyEntity):
         data = self.getData("balance_data")
 
         if data is not None and len(data) > 0:
-            if "details" in data[0].keys():
+            if "details" in data[0]:
                 attributes["details"] = data[0]["details"]
-            if "dueDate" in data[0].keys():
+            if "dueDate" in data[0]:
                 attributes["dueDate"] = data[0]["dueDate"]
 
         return attributes

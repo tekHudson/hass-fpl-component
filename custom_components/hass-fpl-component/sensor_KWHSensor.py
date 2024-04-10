@@ -15,6 +15,7 @@ class ProjectedKWHSensor(FplEnergyEntity):
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         projectedKWH = self.getData("projectedKWH")
 
         if projectedKWH is not None:
@@ -33,10 +34,12 @@ class DailyAverageKWHSensor(FplEnergyEntity):
     """Daily Average KWH sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Daily Average KWH")
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         dailyAverageKWH = self.getData("dailyAverageKWH")
 
         if dailyAverageKWH is not None:
@@ -55,6 +58,7 @@ class BillToDateKWHSensor(FplEnergyEntity):
     """Bill To Date KWH sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Bill To Date KWH")
 
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
@@ -62,12 +66,13 @@ class BillToDateKWHSensor(FplEnergyEntity):
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         billToDateKWH = self.getData("billToDateKWH")
 
         if billToDateKWH is not None:
             self._attr_native_value = billToDateKWH
 
-        print(self.state_class)
+        # print(self.state_class)
 
         return self._attr_native_value
 
@@ -76,10 +81,12 @@ class NetReceivedKWHSensor(FplEnergyEntity):
     """Received Meter Reading KWH sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Received Meter Reading KWH")
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         recMtrReading = self.getData("recMtrReading")
 
         if recMtrReading is not None:
@@ -98,10 +105,12 @@ class NetDeliveredKWHSensor(FplEnergyEntity):
     """Delivered Meter Reading KWH sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Delivered Meter Reading KWH")
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         delMtrReading = self.getData("delMtrReading")
 
         if delMtrReading is not None:

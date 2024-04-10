@@ -13,6 +13,7 @@ class CurrentBillDateSensor(FplDateEntity):
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         current_bill_date = self.getData("current_bill_date")
 
         if current_bill_date is not None:
@@ -25,10 +26,12 @@ class NextBillDateSensor(FplDateEntity):
     """Next bill date sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Next Bill Date")
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         next_bill_date = self.getData("next_bill_date")
 
         if next_bill_date is not None:
@@ -41,12 +44,14 @@ class ServiceDaysSensor(FplDayEntity):
     """Service days sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Service Days")
 
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         service_days = self.getData("service_days")
 
         if service_days is not None:
@@ -59,10 +64,12 @@ class AsOfDaysSensor(FplDayEntity):
     """As of days sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "As Of Days")
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         as_of_days = self.getData("as_of_days")
 
         if as_of_days is not None:
@@ -75,10 +82,12 @@ class RemainingDaysSensor(FplDayEntity):
     """Remaining days sensor."""
 
     def __init__(self, coordinator, config, account):
+        """Initialize the class."""
         super().__init__(coordinator, config, account, "Remaining Days")
 
     @property
     def native_value(self):
+        """Return the value reported by the sensor."""
         remaining_days = self.getData("remaining_days")
 
         if remaining_days is not None:
