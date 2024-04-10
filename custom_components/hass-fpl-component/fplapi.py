@@ -41,7 +41,7 @@ class FplApi:
         self.apiClient = None
 
     async def getTerritory(self):
-        """get territory."""
+        """Get territory."""
         _LOGGER.debug("Getting territory")
         if self._territory is not None:
             return self._territory
@@ -65,7 +65,7 @@ class FplApi:
         return self._territory == FPL_MAINREGION
 
     async def initialize(self):
-        """initialize the api client."""
+        """Initialize the api client."""
         self._territory = await self.getTerritory()
 
         # set the api client based on user's territory
@@ -80,7 +80,7 @@ class FplApi:
                 )
 
     async def get_basic_info(self):
-        """returns basic info for sensor initialization."""
+        """Returns basic info for sensor initialization."""
         await self.initialize()
         data = {}
         data[CONF_TERRITORY] = self._territory
@@ -109,7 +109,7 @@ class FplApi:
         return data
 
     async def login(self):
-        """method to use in config flow."""
+        """Method to use in config flow."""
         try:
             await self.initialize()
 
@@ -123,10 +123,10 @@ class FplApi:
             return LOGIN_RESULT_FAILURE
 
     async def async_get_open_accounts(self):
-        """return open accounts."""
+        """Return open accounts."""
         self.initialize()
         return await self.apiClient.get_open_accounts()
 
     async def logout(self):
-        """log out from fpl."""
+        """Log out from fpl."""
         return await self.apiClient.logout()

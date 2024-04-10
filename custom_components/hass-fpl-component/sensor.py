@@ -44,7 +44,7 @@ sensors = {}
 
 
 def registerSensor(sensor, regions):
-    """register all available sensors."""
+    """Register all available sensors."""
     for region in regions:
         if region in sensors:
             sensors[region].append(sensor)

@@ -55,7 +55,7 @@ class DeferedAmountSensor(FplMoneyEntity):
 
 
 class ProjectedBudgetBillSensor(FplMoneyEntity):
-    """projected budget bill sensor."""
+    """Projected budget bill sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL
 
@@ -73,7 +73,7 @@ class ProjectedBudgetBillSensor(FplMoneyEntity):
 
 
 class ProjectedActualBillSensor(FplMoneyEntity):
-    """projeted actual bill sensor."""
+    """Projeted actual bill sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL
 
@@ -91,7 +91,7 @@ class ProjectedActualBillSensor(FplMoneyEntity):
 
 
 class BillToDateSensor(FplMoneyEntity):
-    """projeted actual bill sensor."""
+    """Projeted actual bill sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL
 

@@ -55,7 +55,7 @@ class FplMainRegionApiClient:
         self.loop = loop
 
     async def login(self):
-        """login into fpl."""
+        """Login into fpl."""
 
         # login and get account information
 
@@ -191,7 +191,7 @@ class FplMainRegionApiClient:
         return data
 
     async def __getFromProjectedBill(self, account, premise, currentBillDate) -> dict:
-        """get data from projected bill endpoint."""
+        """Get data from projected bill endpoint."""
         data = {}
 
         try:
@@ -366,7 +366,7 @@ class FplMainRegionApiClient:
         return data
 
     async def __getDataFromApplianceUsage(self, account, lastBilledDate) -> dict:
-        """get data from appliance usage."""
+        """Get data from appliance usage."""
         _LOGGER.info("Getting appliance usage data")
 
         JSON = {"startDate": str(lastBilledDate.strftime("%m%d%Y"))}
@@ -394,7 +394,7 @@ class FplMainRegionApiClient:
         return {"energy_percent_by_applicance": data}
 
     async def __getDataFromBalance(self, account) -> dict:
-        """get data from appliance usage."""
+        """Get data from appliance usage."""
         _LOGGER.info("Getting appliance usage data")
 
         data = {}

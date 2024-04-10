@@ -29,7 +29,7 @@ class FplNorthwestRegionApiClient:
         self.refresh_token = None
 
     async def login(self):
-        """login using aws."""
+        """Login using aws."""
         client = await self.loop.run_in_executor(
             None, boto3.client, "cognito-idp", "us-east-1"
         )
@@ -117,7 +117,7 @@ class FplNorthwestRegionApiClient:
         return result
 
     async def logout(self):
-        """log out from fpl."""
+        """Log out from fpl."""
 
     async def update(self, account):
         """

@@ -1,4 +1,4 @@
-"""dates sensors."""
+"""Dates sensors."""
 import datetime
 from homeassistant.components.sensor import SensorStateClass
 from .fplEntity import FplDateEntity, FplDayEntity

@@ -76,7 +76,7 @@ class FplDailyUsageKWHSensor(FplEnergyEntity):
 
 
 class FplDailyReceivedKWHSensor(FplEnergyEntity):
-    """daily received Kwh sensor."""
+    """Daily received Kwh sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Daily Received KWH")
@@ -106,7 +106,7 @@ class FplDailyReceivedKWHSensor(FplEnergyEntity):
 
 
 class FplDailyDeliveredKWHSensor(FplEnergyEntity):
-    """daily delivered Kwh sensor."""
+    """Daily delivered Kwh sensor."""
 
     # _attr_state_class = SensorStateClass.TOTAL_INCREASING
 

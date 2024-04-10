@@ -4,7 +4,7 @@ from .fplEntity import FplMoneyEntity
 from homeassistant.components.sensor import SensorStateClass
 
 class DailyAverageSensor(FplMoneyEntity):
-    """average daily sensor, use budget value if available, otherwise use actual daily values."""
+    """Average daily sensor, use budget value if available, otherwise use actual daily values."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Daily Average")
@@ -26,7 +26,7 @@ class DailyAverageSensor(FplMoneyEntity):
 
 
 class BudgetDailyAverageSensor(FplMoneyEntity):
-    """budget daily average sensor."""
+    """Budget daily average sensor."""
 
     def __init__(self, coordinator, config, account):
         super().__init__(coordinator, config, account, "Budget Daily Average")

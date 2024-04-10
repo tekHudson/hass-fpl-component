@@ -1,4 +1,4 @@
-"""energy sensors."""
+"""Energy sensors."""
 from datetime import date, timedelta
 from homeassistant.components.sensor import (
     SensorDeviceClass,

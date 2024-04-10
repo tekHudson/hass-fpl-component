@@ -1,4 +1,4 @@
-"""exceptions file."""
+"""Exceptions file."""
 
 
 class WarrantException(Exception):

@@ -43,7 +43,7 @@ class FplEntity(CoordinatorEntity, SensorEntity):
         }
 
     def customAttributes(self) -> dict:
-        """override this method to set custom attributes."""
+        """Override this method to set custom attributes."""
         return {}
 
     @property
@@ -57,7 +57,7 @@ class FplEntity(CoordinatorEntity, SensorEntity):
         return attributes
 
     def getData(self, field):
-        """call this method to retrieve sensor data."""
+        """Call this method to retrieve sensor data."""
         if self.coordinator.data is not None:
             account = self.coordinator.data.get(self.account)
             if account is not None:
