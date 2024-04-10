@@ -1,4 +1,4 @@
-""" FPL Component. """
+"""FPL Component."""
 
 
 import logging

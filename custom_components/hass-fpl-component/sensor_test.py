@@ -4,7 +4,6 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,
 )
-from homeassistant.core import callback
 from homeassistant.const import STATE_UNKNOWN
 from .fplEntity import FplEnergyEntity
 

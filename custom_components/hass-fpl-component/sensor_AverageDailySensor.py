@@ -1,7 +1,6 @@
 """Average daily sensors."""
 from .fplEntity import FplMoneyEntity
 
-from homeassistant.components.sensor import SensorStateClass
 
 class DailyAverageSensor(FplMoneyEntity):
     """Average daily sensor, use budget value if available, otherwise use actual daily values."""

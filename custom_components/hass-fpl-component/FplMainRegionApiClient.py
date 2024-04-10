@@ -80,8 +80,7 @@ class FplMainRegionApiClient:
         return LOGIN_RESULT_FAILURE
 
     async def get_open_accounts(self):
-        """
-        Get open accounts
+        """Get open accounts
 
         Returns array with active account numbers
         """

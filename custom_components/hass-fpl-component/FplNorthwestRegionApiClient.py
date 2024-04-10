@@ -1,5 +1,5 @@
 """FPL Northwest data collection api client."""
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 import async_timeout
 import boto3
@@ -95,8 +95,7 @@ class FplNorthwestRegionApiClient:
             return LOGIN_RESULT_OK
 
     async def get_open_accounts(self):
-        """
-        Returns the open accounts
+        """Returns the open accounts
         """
 
         result = []
@@ -120,8 +119,7 @@ class FplNorthwestRegionApiClient:
         """Log out from fpl."""
 
     async def update(self, account):
-        """
-        Returns the data collected from fpl
+        """Returns the data collected from fpl
         """
 
         URL = (
