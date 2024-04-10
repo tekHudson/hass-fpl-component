@@ -1,4 +1,4 @@
-"""AWS SRP."""
+"""AWS SRP"""
 import os
 import base64
 import binascii
@@ -38,7 +38,7 @@ info_bits = bytearray("Caldera Derived Key", "utf-8")
 
 
 def hash_sha256(buf):
-    """AuthenticationHelper.hash."""
+    """AuthenticationHelper.hash"""
     a = hashlib.sha256(buf).hexdigest()
     return (64 - len(a)) * "0" + a
 
@@ -61,7 +61,8 @@ def get_random(nbytes):
 
 
 def pad_hex(long_int):
-    """Converts a Long integer (or hex string) to hex format padded with zeroes for hashing
+    """
+    Converts a Long integer (or hex string) to hex format padded with zeroes for hashing
     :param {Long integer|String} long_int Number or string to pad.
     :return {String} Padded hex string.
     """
@@ -77,7 +78,8 @@ def pad_hex(long_int):
 
 
 def compute_hkdf(ikm, salt):
-    """Standard hkdf algorithm
+    """
+    Standard hkdf algorithm
     :param {Buffer} ikm Input key material.
     :param {Buffer} salt Salt value.
     :return {Buffer} Strong key material.
@@ -90,7 +92,8 @@ def compute_hkdf(ikm, salt):
 
 
 def calculate_u(big_a, big_b):
-    """Calculate the client's value U which is the hash of A and B
+    """
+    Calculate the client's value U which is the hash of A and B
     :param {Long integer} big_a Large A value.
     :param {Long integer} big_b Server B value.
     :return {Long integer} Computed U value.
@@ -99,7 +102,7 @@ def calculate_u(big_a, big_b):
     return hex_to_long(u_hex_hash)
 
 
-class AWSSRP:
+class AWSSRP(object):
 
     NEW_PASSWORD_REQUIRED_CHALLENGE = "NEW_PASSWORD_REQUIRED"
     PASSWORD_VERIFIER_CHALLENGE = "PASSWORD_VERIFIER"
@@ -115,7 +118,6 @@ class AWSSRP:
         client_secret=None,
         loop=None,
     ):
-        """Initialize the class."""
         if pool_region is not None and client is not None:
             raise ValueError(
                 "pool_region and client should not both be specified "
@@ -138,14 +140,16 @@ class AWSSRP:
         self.loop = loop
 
     def generate_random_small_a(self):
-        """Helper function to generate a random big integer
+        """
+        helper function to generate a random big integer
         :return {Long integer} a random value.
         """
         random_long_int = get_random(128)
         return random_long_int % self.big_n
 
     def calculate_a(self):
-        """Calculate the client's public value A = g^a%N
+        """
+        Calculate the client's public value A = g^a%N
         with the generated random number a
         :param {Long integer} a Randomly generated small A.
         :return {Long integer} Computed large A.
@@ -157,7 +161,8 @@ class AWSSRP:
         return big_a
 
     def get_password_authentication_key(self, username, password, server_b_value, salt):
-        """Calculates the final hkdf based on computed S value, and computed U value and the key
+        """
+        Calculates the final hkdf based on computed S value, and computed U value and the key
         :param {String} username Username.
         :param {String} password Password.
         :param {Long integer} server_b_value Server B value.
@@ -241,7 +246,7 @@ class AWSSRP:
         return response
 
     async def authenticate_user(self, client=None):
-        """Authenticate user."""
+        """authenticate user"""
         boto_client = self.client or client
         auth_params = self.get_auth_params()
 
