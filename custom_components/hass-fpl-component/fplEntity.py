@@ -32,7 +32,7 @@ class FplEntity(CoordinatorEntity, SensorEntity):
 
     @property
     def name(self):
-        """Return `Domain account sensorName`."""
+        """Return 'Domain account sensorName'."""
         return f"{DOMAIN.upper()} {self.account} {self.sensorName}"
 
     @property

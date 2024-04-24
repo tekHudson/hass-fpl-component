@@ -1,5 +1,5 @@
 {
-  "domain": "fpl_component",
+  "domain": "hass-fpl-component",
   "name": "FPL Integration",
   "codeowners": [
     "@tekHudson"
