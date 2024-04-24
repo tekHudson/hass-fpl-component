@@ -4,14 +4,14 @@
   "codeowners": [
     "@tekHudson"
   ],
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/tekHudson/hass-fpl-component",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "config_flow": true,
+  "issue_tracker": "https://github.com/tekHudson/hass-fpl-component/issues",
   "requirements": [
     "integrationhelper"
   ],
-  "version": "0.0.1",
-  "issue_tracker": "https://github.com/tekHudson/hass-fpl-component/issues"
+  "version": "0.0.1"
 }
