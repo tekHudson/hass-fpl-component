@@ -22,9 +22,10 @@ from .const import (
 
 from .fplapi import FplApi
 
-with contextlib.suppress(Exception):
+try:
     from .secrets import DEFAULT_CONF_PASSWORD, DEFAULT_CONF_USERNAME
-
+except:
+    pass
 
 @callback
 def configured_instances(hass):
