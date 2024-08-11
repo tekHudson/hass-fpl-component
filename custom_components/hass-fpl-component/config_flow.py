@@ -47,17 +47,9 @@ class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Initialize the class."""
     self._errors = {}
 
-  async def async_step_user(
-    self, user_input=None
-  ):  # pylint: disable=dangerous-default-value
+  async def async_step_user(self, user_input=None):  # pylint: disable=dangerous-default-value
     """Handle a flow initialized by the user."""
     self._errors = {}
-
-    # if self._async_current_entries():
-    #  return self.async_abort(reason="single_instance_allowed")
-
-    # if self.hass.data.get(DOMAIN):
-    #  return self.async_abort(reason="single_instance_allowed")
 
     if user_input is not None:
       username = user_input[CONF_USERNAME]
@@ -113,7 +105,9 @@ class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     data_schema[vol.Required(CONF_PASSWORD, default=password)] = str
 
     return self.async_show_form(
-      step_id="user", data_schema=vol.Schema(data_schema), errors=self._errors
+      step_id="user",
+      data_schema=vol.Schema(data_schema),
+      errors=self._errors
     )
 
   async def async_step_import(self, user_input):  # pylint: disable=unused-argument

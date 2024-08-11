@@ -1,6 +1,6 @@
 {
   "name": "tekHudson/custom_components/hass-fpl-component",
-  "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12-bullseye",
   "postCreateCommand": "scripts/setup",
   "forwardPorts": [
     8123
@@ -20,18 +20,18 @@
         "ms-python.vscode-pylance"
       ],
       "settings": {
+        "editor.formatOnPaste": false,
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "editor.tabSize": 2,
         "files.eol": "\n",
-        "editor.tabSize": 4,
+        "files.trimTrailingWhitespace": true,
         "python.pythonPath": "/usr/bin/python3",
         "python.analysis.autoSearchPaths": false,
         "python.linting.pylintEnabled": true,
         "python.linting.enabled": true,
         "python.formatting.provider": "black",
-        "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
-        "editor.formatOnPaste": false,
-        "editor.formatOnSave": true,
-        "editor.formatOnType": true,
-        "files.trimTrailingWhitespace": true
+        "python.formatting.blackPath": "/usr/local/py-utils/bin/black"
       }
     }
   },
