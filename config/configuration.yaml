@@ -5,4 +5,4 @@ default_config:
 logger:
   default: info
   logs:
-    custom_components.custom_components/hass-fpl-component: debug
+  custom_components.custom_components/hass-fpl-component: debug

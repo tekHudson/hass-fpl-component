@@ -8,12 +8,12 @@ import async_timeout
 
 
 from .const import (
-    API_HOST,
-    LOGIN_RESULT_FAILURE,
-    LOGIN_RESULT_INVALIDPASSWORD,
-    LOGIN_RESULT_INVALIDUSER,
-    LOGIN_RESULT_OK,
-    TIMEOUT,
+  API_HOST,
+  LOGIN_RESULT_FAILURE,
+  LOGIN_RESULT_INVALIDPASSWORD,
+  LOGIN_RESULT_INVALIDUSER,
+  LOGIN_RESULT_OK,
+  TIMEOUT,
 )
 
 STATUS_CATEGORY_OPEN = "OPEN"
@@ -21,21 +21,26 @@ STATUS_CATEGORY_OPEN = "OPEN"
 URL_LOGIN = API_HOST + "/api/resources/login"
 
 URL_BUDGET_BILLING_GRAPH = (
-    API_HOST + "/api/resources/account/{account}/budgetBillingGraph"
+  API_HOST + "/api/resources/account/{account}/budgetBillingGraph"
 )
 
 URL_RESOURCES_PROJECTED_BILL = (
-    API_HOST
-    + "/api/resources/account/{account}/projectedBill"
-    + "?premiseNumber={premise}&lastBilledDate={lastBillDate}"
+  API_HOST
+  + "/api/resources/account/{account}/projectedBill"
+  + "?premiseNumber={premise}&lastBilledDate={lastBillDate}"
 )
 
+
+URL_ENERGY_SERVICE = (
+  API_HOST + "/dashboard-api/resources/account/{account}/energyService/{account}"
+)
 
 URL_APPLIANCE_USAGE = (
-    API_HOST + "/dashboard-api/resources/account/{account}/applianceUsage/{account}"
+  API_HOST + "/dashboard-api/resources/account/{account}/applianceUsage/{account}"
 )
+
 URL_BUDGET_BILLING_PREMISE_DETAILS = (
-    API_HOST + "/api/resources/account/{account}/budgetBillingGraph/premiseDetails"
+  API_HOST + "/api/resources/account/{account}/budgetBillingGraph/premiseDetails"
 )
 
 
@@ -46,359 +51,357 @@ _LOGGER = logging.getLogger(__package__)
 
 
 class FplMainRegionApiClient:
-    """Fpl Main Region Api Client."""
+  """Fpl Main Region Api Client."""
 
-    def __init__(self, username, password, loop, session) -> None:
-        """Initialize the class."""
-        self.session = session
-        self.username = username
-        self.password = password
-        self.loop = loop
+  def __init__(self, username, password, loop, session) -> None:
+    """Initialize the class."""
+    self.session = session
+    self.username = username
+    self.password = password
+    self.loop = loop
 
-    async def login(self):
-        """Login into fpl."""
+  async def login(self):
+    """Login into fpl."""
 
-        # login and get account information
+    # login and get account information
 
-        async with async_timeout.timeout(TIMEOUT):
-            response = await self.session.get(
-                URL_LOGIN,
-                auth=aiohttp.BasicAuth(self.username, self.password),
-            )
+    async with async_timeout.timeout(TIMEOUT):
+      response = await self.session.get(
+        URL_LOGIN,
+        auth=aiohttp.BasicAuth(self.username, self.password),
+      )
 
+    if response.status == 200:
+      return LOGIN_RESULT_OK
+
+    if response.status == 401:
+      json_data = json.loads(await response.text())
+
+      if json_data["messageCode"] == LOGIN_RESULT_INVALIDUSER:
+        return LOGIN_RESULT_INVALIDUSER
+
+      if json_data["messageCode"] == LOGIN_RESULT_INVALIDPASSWORD:
+        return LOGIN_RESULT_INVALIDPASSWORD
+
+    return LOGIN_RESULT_FAILURE
+
+  async def get_open_accounts(self):
+    """Get open accounts. Returns array with active account numbers."""
+    result = []
+    URL = API_HOST + "/api/resources/header"
+    async with async_timeout.timeout(TIMEOUT):
+      response = await self.session.get(URL)
+
+    json_data = await response.json()
+    accounts = json_data["data"]["accounts"]["data"]["data"]
+
+    for account in accounts:
+      if account["statusCategory"] == STATUS_CATEGORY_OPEN:
+        result.append(account["accountNumber"])
+
+    return result
+
+  async def logout(self):
+    """Log out from FPL."""
+    _LOGGER.info("Logging out")
+
+    URL_LOGOUT = API_HOST + "/api/resources/logout"
+    try:
+      async with async_timeout.timeout(TIMEOUT):
+        await self.session.get(URL_LOGOUT)
+    except Exception as e:
+      _LOGGER.error(e)
+
+  async def update(self, account) -> dict:
+    """Get data from resources endpoint."""
+    data = {}
+
+    URL_RESOURCES_ACCOUNT = API_HOST + "/api/resources/account/{account}"
+
+    async with async_timeout.timeout(TIMEOUT):
+      response = await self.session.get(
+        URL_RESOURCES_ACCOUNT.format(account=account)
+      )
+    account_data = (await response.json())["data"]
+
+    premise = account_data.get("premiseNumber").zfill(9)
+
+    data["meterSerialNo"] = account_data["meterSerialNo"]
+
+    # currentBillDate
+    currentBillDate = datetime.strptime(
+      account_data["currentBillDate"].replace("-", "").split("T")[0], "%Y%m%d"
+    ).date()
+
+    # nextBillDate
+    nextBillDate = datetime.strptime(
+      account_data["nextBillDate"].replace("-", "").split("T")[0], "%Y%m%d"
+    ).date()
+
+    data["current_bill_date"] = str(currentBillDate)
+    data["next_bill_date"] = str(nextBillDate)
+
+    today = datetime.now().date()
+
+    data["service_days"] = (nextBillDate - currentBillDate).days
+    data["as_of_days"] = (today - currentBillDate).days
+    data["remaining_days"] = (nextBillDate - today).days
+
+    # zip code
+    # zip_code = accountData["serviceAddress"]["zip"]
+
+    # projected bill
+    pbData = await self.__getFromProjectedBill(account, premise, currentBillDate)
+    data.update(pbData)
+
+    # programs
+    programsData = account_data["programs"]["data"]
+
+    programs = []
+    _LOGGER.info("Getting Programs")
+    for program in programsData:
+      if "enrollmentStatus" in program:
+        key = program["name"]
+        programs[key] = program["enrollmentStatus"] == ENROLLED
+
+    def hasProgram(programName) -> bool:
+      return programName in programs and programs[programName]
+
+    # Budget Billing program
+    if hasProgram("BBL"):
+      data["budget_bill"] = True
+      bbl_data = await self.__getBBL_async(account, data)
+      data.update(bbl_data)
+    else:
+      data["budget_bill"] = False
+
+    # Get data from energy service
+    data.update(
+      await self.__getDataFromEnergyService(account, premise, currentBillDate)
+    )
+
+    # Get data from energy service ( hourly )
+    # data.update(
+    #  await self.__getDataFromEnergyServiceHourly(
+    #    account, premise, currentBillDate
+    #  )
+    # )
+
+    data.update(await self.__getDataFromApplianceUsage(account, currentBillDate))
+    data.update(await self.__getDataFromBalance(account))
+
+    return data
+
+  async def __getFromProjectedBill(self, account, premise, currentBillDate) -> dict:
+    """Get data from projected bill endpoint."""
+    data = {}
+
+    try:
+      async with async_timeout.timeout(TIMEOUT):
+        response = await self.session.get(
+          URL_RESOURCES_PROJECTED_BILL.format(
+            account=account,
+            premise=premise,
+            lastBillDate=currentBillDate.strftime("%m%d%Y"),
+          )
+        )
+
+      if response.status == 200:
+        projectedBillData = (await response.json())["data"]
+
+        billToDate = float(projectedBillData["billToDate"])
+        projectedBill = float(projectedBillData["projectedBill"])
+        dailyAvg = float(projectedBillData["dailyAvg"])
+        avgHighTemp = int(projectedBillData["avgHighTemp"])
+
+        data["bill_to_date"] = billToDate
+        data["projected_bill"] = projectedBill
+        data["daily_avg"] = dailyAvg
+        data["avg_high_temp"] = avgHighTemp
+
+    except Exception as e:
+      _LOGGER.error(e)
+
+    return data
+
+  async def __getBBL_async(self, account, projectedBillData) -> dict:
+    """Get budget billing data."""
+    _LOGGER.info("Getting budget billing data")
+    data = {}
+
+    try:
+      async with async_timeout.timeout(TIMEOUT):
+        response = await self.session.get(
+          URL_BUDGET_BILLING_PREMISE_DETAILS.format(account=account)
+        )
         if response.status == 200:
-            return LOGIN_RESULT_OK
+          r = (await response.json())["data"]
+          dataList = r["graphData"]
 
-        if response.status == 401:
-            json_data = json.loads(await response.text())
+          # startIndex = len(dataList) - 1
 
-            if json_data["messageCode"] == LOGIN_RESULT_INVALIDUSER:
-                return LOGIN_RESULT_INVALIDUSER
+          billingCharge = 0
+          budgetBillDeferBalance = r["defAmt"]
 
-            if json_data["messageCode"] == LOGIN_RESULT_INVALIDPASSWORD:
-                return LOGIN_RESULT_INVALIDPASSWORD
+          projectedBill = projectedBillData["projected_bill"]
+          asOfDays = projectedBillData["as_of_days"]
 
-        return LOGIN_RESULT_FAILURE
+          for det in dataList:
+            billingCharge += det["actuallBillAmt"]
 
-    async def get_open_accounts(self):
-        """Get open accounts. Returns array with active account numbers."""
-        result = []
-        URL = API_HOST + "/api/resources/header"
-        async with async_timeout.timeout(TIMEOUT):
-            response = await self.session.get(URL)
+          calc1 = (projectedBill + billingCharge) / 12
+          calc2 = (1 / 12) * (budgetBillDeferBalance)
 
-        json_data = await response.json()
-        accounts = json_data["data"]["accounts"]["data"]["data"]
+          projectedBudgetBill = round(calc1 + calc2, 2)
+          bbDailyAvg = round(projectedBudgetBill / 30, 2)
+          bbAsOfDateAmt = round(projectedBudgetBill / 30 * asOfDays, 2)
 
-        for account in accounts:
-            if account["statusCategory"] == STATUS_CATEGORY_OPEN:
-                result.append(account["accountNumber"])
+          data["budget_billing_daily_avg"] = bbDailyAvg
+          data["budget_billing_bill_to_date"] = bbAsOfDateAmt
 
-        return result
+          data["budget_billing_projected_bill"] = float(projectedBudgetBill)
 
-    async def logout(self):
-        """Log out from FPL."""
-        _LOGGER.info("Logging out")
-
-        URL_LOGOUT = API_HOST + "/api/resources/logout"
-        try:
-            async with async_timeout.timeout(TIMEOUT):
-                await self.session.get(URL_LOGOUT)
-        except Exception as e:
-            _LOGGER.error(e)
-
-    async def update(self, account) -> dict:
-        """Get data from resources endpoint."""
-        data = {}
-
-        URL_RESOURCES_ACCOUNT = API_HOST + "/api/resources/account/{account}"
-
-        async with async_timeout.timeout(TIMEOUT):
-            response = await self.session.get(
-                URL_RESOURCES_ACCOUNT.format(account=account)
-            )
-        account_data = (await response.json())["data"]
-
-        premise = account_data.get("premiseNumber").zfill(9)
-
-        data["meterSerialNo"] = account_data["meterSerialNo"]
-
-        # currentBillDate
-        currentBillDate = datetime.strptime(
-            account_data["currentBillDate"].replace("-", "").split("T")[0], "%Y%m%d"
-        ).date()
-
-        # nextBillDate
-        nextBillDate = datetime.strptime(
-            account_data["nextBillDate"].replace("-", "").split("T")[0], "%Y%m%d"
-        ).date()
-
-        data["current_bill_date"] = str(currentBillDate)
-        data["next_bill_date"] = str(nextBillDate)
-
-        today = datetime.now().date()
-
-        data["service_days"] = (nextBillDate - currentBillDate).days
-        data["as_of_days"] = (today - currentBillDate).days
-        data["remaining_days"] = (nextBillDate - today).days
-
-        # zip code
-        # zip_code = accountData["serviceAddress"]["zip"]
-
-        # projected bill
-        pbData = await self.__getFromProjectedBill(account, premise, currentBillDate)
-        data.update(pbData)
-
-        # programs
-        programsData = account_data["programs"]["data"]
-
-        programs = []
-        _LOGGER.info("Getting Programs")
-        for program in programsData:
-            if "enrollmentStatus" in program:
-                key = program["name"]
-                programs[key] = program["enrollmentStatus"] == ENROLLED
-
-        def hasProgram(programName) -> bool:
-            return programName in programs and programs[programName]
-
-        # Budget Billing program
-        if hasProgram("BBL"):
-            data["budget_bill"] = True
-            bbl_data = await self.__getBBL_async(account, data)
-            data.update(bbl_data)
-        else:
-            data["budget_bill"] = False
-
-        # Get data from energy service
-        data.update(
-            await self.__getDataFromEnergyService(account, premise, currentBillDate)
+      async with async_timeout.timeout(TIMEOUT):
+        response = await self.session.get(
+          URL_BUDGET_BILLING_GRAPH.format(account=account)
         )
+        if response.status == 200:
+          r = (await response.json())["data"]
+          data["bill_to_date"] = float(r["eleAmt"])
+          data["defered_amount"] = float(r["defAmt"])
+    except Exception as e:
+      _LOGGER.error(e)
 
-        # Get data from energy service ( hourly )
-        # data.update(
-        #    await self.__getDataFromEnergyServiceHourly(
-        #        account, premise, currentBillDate
-        #    )
-        # )
+    return data
 
-        data.update(await self.__getDataFromApplianceUsage(account, currentBillDate))
-        data.update(await self.__getDataFromBalance(account))
+  async def __getDataFromEnergyService(self, account, premise, lastBilledDate) -> dict:
+    _LOGGER.info("Getting energy service data")
 
-        return data
+    date = str(lastBilledDate.strftime("%m%d%Y"))
+    JSON = {
+      "recordCount": 24,
+      "status": 2,
+      "channel": "WEB",
+      "amrFlag": "Y",
+      "accountType": "RESIDENTIAL",
+      "revCode": "1",
+      "premiseNumber": premise,
+      "projectedBillFlag": True,
+      "billComparisionFlag": True,
+      "monthlyFlag": True,
+      "frequencyType": "Daily",
+      "lastBilledDate": date,
+      "applicationPage": "resDashBoard",
+    }
+    URL_ENERGY_SERVICE = (
+      API_HOST
+      + "/dashboard-api/resources/account/{account}/energyService/{account}"
+    )
 
-    async def __getFromProjectedBill(self, account, premise, currentBillDate) -> dict:
-        """Get data from projected bill endpoint."""
-        data = {}
-
-        try:
-            async with async_timeout.timeout(TIMEOUT):
-                response = await self.session.get(
-                    URL_RESOURCES_PROJECTED_BILL.format(
-                        account=account,
-                        premise=premise,
-                        lastBillDate=currentBillDate.strftime("%m%d%Y"),
-                    )
-                )
-
-            if response.status == 200:
-                projectedBillData = (await response.json())["data"]
-
-                billToDate = float(projectedBillData["billToDate"])
-                projectedBill = float(projectedBillData["projectedBill"])
-                dailyAvg = float(projectedBillData["dailyAvg"])
-                avgHighTemp = int(projectedBillData["avgHighTemp"])
-
-                data["bill_to_date"] = billToDate
-                data["projected_bill"] = projectedBill
-                data["daily_avg"] = dailyAvg
-                data["avg_high_temp"] = avgHighTemp
-
-        except Exception as e:
-            _LOGGER.error(e)
-
-        return data
-
-    async def __getBBL_async(self, account, projectedBillData) -> dict:
-        """Get budget billing data."""
-        _LOGGER.info("Getting budget billing data")
-        data = {}
-
-        try:
-            async with async_timeout.timeout(TIMEOUT):
-                response = await self.session.get(
-                    URL_BUDGET_BILLING_PREMISE_DETAILS.format(account=account)
-                )
-                if response.status == 200:
-                    r = (await response.json())["data"]
-                    dataList = r["graphData"]
-
-                    # startIndex = len(dataList) - 1
-
-                    billingCharge = 0
-                    budgetBillDeferBalance = r["defAmt"]
-
-                    projectedBill = projectedBillData["projected_bill"]
-                    asOfDays = projectedBillData["as_of_days"]
-
-                    for det in dataList:
-                        billingCharge += det["actuallBillAmt"]
-
-                    calc1 = (projectedBill + billingCharge) / 12
-                    calc2 = (1 / 12) * (budgetBillDeferBalance)
-
-                    projectedBudgetBill = round(calc1 + calc2, 2)
-                    bbDailyAvg = round(projectedBudgetBill / 30, 2)
-                    bbAsOfDateAmt = round(projectedBudgetBill / 30 * asOfDays, 2)
-
-                    data["budget_billing_daily_avg"] = bbDailyAvg
-                    data["budget_billing_bill_to_date"] = bbAsOfDateAmt
-
-                    data["budget_billing_projected_bill"] = float(projectedBudgetBill)
-
-            async with async_timeout.timeout(TIMEOUT):
-                response = await self.session.get(
-                    URL_BUDGET_BILLING_GRAPH.format(account=account)
-                )
-                if response.status == 200:
-                    r = (await response.json())["data"]
-                    data["bill_to_date"] = float(r["eleAmt"])
-                    data["defered_amount"] = float(r["defAmt"])
-        except Exception as e:
-            _LOGGER.error(e)
-
-        return data
-
-    async def __getDataFromEnergyService(
-        self, account, premise, lastBilledDate
-    ) -> dict:
-        _LOGGER.info("Getting energy service data")
-
-        date = str(lastBilledDate.strftime("%m%d%Y"))
-        JSON = {
-            "recordCount": 24,
-            "status": 2,
-            "channel": "WEB",
-            "amrFlag": "Y",
-            "accountType": "RESIDENTIAL",
-            "revCode": "1",
-            "premiseNumber": premise,
-            "projectedBillFlag": True,
-            "billComparisionFlag": True,
-            "monthlyFlag": True,
-            "frequencyType": "Daily",
-            "lastBilledDate": date,
-            "applicationPage": "resDashBoard",
-        }
-        URL_ENERGY_SERVICE = (
-            API_HOST
-            + "/dashboard-api/resources/account/{account}/energyService/{account}"
+    data = {}
+    try:
+      async with async_timeout.timeout(TIMEOUT):
+        response = await self.session.post(
+          URL_ENERGY_SERVICE.format(account=account), json=JSON
         )
+        if response.status == 200:
+          rd = await response.json()
+          if "data" not in rd:
+            return []
 
-        data = {}
-        try:
-            async with async_timeout.timeout(TIMEOUT):
-                response = await self.session.post(
-                    URL_ENERGY_SERVICE.format(account=account), json=JSON
+          r = rd["data"]
+          dailyUsage = []
+
+          # totalPowerUsage = 0
+          if (
+            "data" in rd
+            and "DailyUsage" in rd["data"]
+            and "data" in rd["data"]["DailyUsage"]
+          ):
+            dailyData = rd["data"]["DailyUsage"]["data"]
+            for daily in dailyData:
+              if daily["missingDay"] != "true":
+                dailyUsage.append(
+                  {
+                    "usage": daily.get("kwhUsed", None),
+                    "cost": daily.get("billingCharge", None),
+                    # "date": daily["date"],
+                    "max_temperature": daily.get("averageHighTemperature", None),
+                    "netDeliveredKwh": daily.get("netDeliveredKwh", 0),
+                    "netReceivedKwh": daily.get("netReceivedKwh", 0),
+                    "readTime": datetime.fromisoformat(
+                      daily[
+                        "readTime"
+                      ]  # 2022-02-25T00:00:00.000-05:00
+                    ),
+                  }
                 )
-                if response.status == 200:
-                    rd = await response.json()
-                    if "data" not in rd:
-                        return []
+              # totalPowerUsage += int(daily["kwhUsed"])
 
-                    r = rd["data"]
-                    dailyUsage = []
+            # data["total_power_usage"] = totalPowerUsage
+            data["daily_usage"] = dailyUsage
 
-                    # totalPowerUsage = 0
-                    if (
-                        "data" in rd
-                        and "DailyUsage" in rd["data"]
-                        and "data" in rd["data"]["DailyUsage"]
-                    ):
-                        dailyData = rd["data"]["DailyUsage"]["data"]
-                        for daily in dailyData:
-                            if daily["missingDay"] != "true":
-                                dailyUsage.append(
-                                    {
-                                        "usage": daily.get("kwhUsed", None),
-                                        "cost": daily.get("billingCharge", None),
-                                        # "date": daily["date"],
-                                        "max_temperature": daily.get("averageHighTemperature", None),
-                                        "netDeliveredKwh": daily.get("netDeliveredKwh", 0),
-                                        "netReceivedKwh": daily.get("netReceivedKwh", 0),
-                                        "readTime": datetime.fromisoformat(
-                                            daily[
-                                                "readTime"
-                                            ]  # 2022-02-25T00:00:00.000-05:00
-                                        ),
-                                    }
-                                )
-                            # totalPowerUsage += int(daily["kwhUsed"])
+          currentUsage = r["CurrentUsage"]
+          data["projectedKWH"] = currentUsage["projectedKWH"]
+          data["dailyAverageKWH"] = float(currentUsage["dailyAverageKWH"])
+          data["billToDateKWH"] = float(currentUsage["billToDateKWH"])
+          data["recMtrReading"] = int(currentUsage["recMtrReading"] or 0)
+          data["delMtrReading"] = int(currentUsage["delMtrReading"] or 0)
+          data["billStartDate"] = currentUsage["billStartDate"]
+    except Exception as e:
+      _LOGGER.error(e)
 
-                        # data["total_power_usage"] = totalPowerUsage
-                        data["daily_usage"] = dailyUsage
+    return data
 
-                    currentUsage = r["CurrentUsage"]
-                    data["projectedKWH"] = currentUsage["projectedKWH"]
-                    data["dailyAverageKWH"] = float(currentUsage["dailyAverageKWH"])
-                    data["billToDateKWH"] = float(currentUsage["billToDateKWH"])
-                    data["recMtrReading"] = int(currentUsage["recMtrReading"] or 0)
-                    data["delMtrReading"] = int(currentUsage["delMtrReading"] or 0)
-                    data["billStartDate"] = currentUsage["billStartDate"]
-        except Exception as e:
-            _LOGGER.error(e)
+  async def __getDataFromApplianceUsage(self, account, lastBilledDate) -> dict:
+    """Get data from appliance usage."""
+    _LOGGER.info("Getting appliance usage data")
 
-        return data
+    JSON = {"startDate": str(lastBilledDate.strftime("%m%d%Y"))}
+    data = {}
 
-    async def __getDataFromApplianceUsage(self, account, lastBilledDate) -> dict:
-        """Get data from appliance usage."""
-        _LOGGER.info("Getting appliance usage data")
+    try:
+      async with async_timeout.timeout(TIMEOUT):
+        response = await self.session.post(
+          URL_APPLIANCE_USAGE.format(account=account), json=JSON
+        )
+        if response.status == 200:
+          electric = (await response.json())["data"]["electric"]
 
-        JSON = {"startDate": str(lastBilledDate.strftime("%m%d%Y"))}
-        data = {}
+          full = 100
+          for e in electric:
+            rr = round(float(e["percentageDollar"]))
+            if rr < full:
+              full = full - rr
+            else:
+              rr = full
+            data[e["category"].replace(" ", "_")] = rr
+    except Exception as e:
+      _LOGGER.error(e)
 
-        try:
-            async with async_timeout.timeout(TIMEOUT):
-                response = await self.session.post(
-                    URL_APPLIANCE_USAGE.format(account=account), json=JSON
-                )
-                if response.status == 200:
-                    electric = (await response.json())["data"]["electric"]
+    return {"energy_percent_by_applicance": data}
 
-                    full = 100
-                    for e in electric:
-                        rr = round(float(e["percentageDollar"]))
-                        if rr < full:
-                            full = full - rr
-                        else:
-                            rr = full
-                        data[e["category"].replace(" ", "_")] = rr
-        except Exception as e:
-            _LOGGER.error(e)
+  async def __getDataFromBalance(self, account) -> dict:
+    """Get data from appliance usage."""
+    _LOGGER.info("Getting appliance usage data")
 
-        return {"energy_percent_by_applicance": data}
+    data = {}
 
-    async def __getDataFromBalance(self, account) -> dict:
-        """Get data from appliance usage."""
-        _LOGGER.info("Getting appliance usage data")
+    URL_BALANCE = API_HOST + "/api/resources/account/{account}/balance?count=-1"
 
-        data = {}
+    try:
+      async with async_timeout.timeout(TIMEOUT):
+        response = await self.session.get(URL_BALANCE.format(account=account))
+        if response.status == 200:
+          data = (await response.json())["data"]
 
-        URL_BALANCE = API_HOST + "/api/resources/account/{account}/balance?count=-1"
+          # indice = [i for i, x in enumerate(data) if x["details"] == "DEBT"][
+          #   0
+          # ]
 
-        try:
-            async with async_timeout.timeout(TIMEOUT):
-                response = await self.session.get(URL_BALANCE.format(account=account))
-                if response.status == 200:
-                    data = (await response.json())["data"]
+          # deb = data[indice]["amount"]
 
-                    # indice = [i for i, x in enumerate(data) if x["details"] == "DEBT"][
-                    #     0
-                    # ]
+    except Exception as e:
+      _LOGGER.error(e)
 
-                    # deb = data[indice]["amount"]
-
-        except Exception as e:
-            _LOGGER.error(e)
-
-        return {"balance_data": data}
+    return {"balance_data": data}

@@ -1,143 +1,143 @@
 """Daily Usage Sensors."""
 from datetime import timedelta, datetime
 from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorStateClass,
+  SensorDeviceClass,
+  SensorStateClass,
 )
 from .fplEntity import FplEnergyEntity, FplMoneyEntity
 
 
 class FplDailyUsageSensor(FplMoneyEntity):
-    """Daily Usage Cost Sensor."""
+  """Daily Usage Cost Sensor."""
 
-    def __init__(self, coordinator, config, account):
-        """Initialize the class."""
-        super().__init__(coordinator, config, account, "Daily Usage")
+  def __init__(self, coordinator, config, account):
+    """Initialize the class."""
+    super().__init__(coordinator, config, account, "Daily Usage")
 
-    @property
-    def native_value(self):
-        """Return the value reported by the sensor."""
-        data = self.getData("daily_usage")
+  @property
+  def native_value(self):
+    """Return the value reported by the sensor."""
+    data = self.getData("daily_usage")
 
-        if data is not None and len(data) > 0 and "cost" in data[-1]:
-            self._attr_native_value = data[-1]["cost"]
+    if data is not None and len(data) > 0 and "cost" in data[-1]:
+      self._attr_native_value = data[-1]["cost"]
 
-        return self._attr_native_value
+    return self._attr_native_value
 
-    def customAttributes(self):
-        """Return the state attributes."""
-        data = self.getData("daily_usage")
-        attributes = {}
-        # attributes["state_class"] = SensorStateClass.TOTAL_INCREASING
-        if data is not None and len(data) > 0 and "readTime" in data[-1]:
-            attributes["date"] = data[-1]["readTime"]
+  def customAttributes(self):
+    """Return the state attributes."""
+    data = self.getData("daily_usage")
+    attributes = {}
+    # attributes["state_class"] = SensorStateClass.TOTAL_INCREASING
+    if data is not None and len(data) > 0 and "readTime" in data[-1]:
+      attributes["date"] = data[-1]["readTime"]
 
-        return attributes
+    return attributes
 
 
 class FplDailyUsageKWHSensor(FplEnergyEntity):
-    """Daily Usage Kwh Sensor."""
+  """Daily Usage Kwh Sensor."""
 
-    def __init__(self, coordinator, config, account):
-        """Initialize the class."""
-        super().__init__(coordinator, config, account, "Daily Usage KWH")
+  def __init__(self, coordinator, config, account):
+    """Initialize the class."""
+    super().__init__(coordinator, config, account, "Daily Usage KWH")
 
-    _attr_state_class = SensorStateClass.TOTAL_INCREASING
-    _attr_device_class = SensorDeviceClass.ENERGY
+  _attr_state_class = SensorStateClass.TOTAL_INCREASING
+  _attr_device_class = SensorDeviceClass.ENERGY
 
-    @property
-    def native_value(self):
-        """Return the value reported by the sensor."""
-        data = self.getData("daily_usage")
+  @property
+  def native_value(self):
+    """Return the value reported by the sensor."""
+    data = self.getData("daily_usage")
 
-        if data is not None and len(data) > 0 and "usage" in data[-1]:
-            self._attr_native_value = data[-1]["usage"]
+    if data is not None and len(data) > 0 and "usage" in data[-1]:
+      self._attr_native_value = data[-1]["usage"]
 
-        return self._attr_native_value
+    return self._attr_native_value
 
-    @property
-    def last_reset(self) -> datetime | None:
-        """Return the time when the sensor was last reset, if any."""
-        data = self.getData("daily_usage")
-        if data is not None and len(data) > 0 and "usage" in data[-1]:
-            date = data[-1]["readTime"]
-            _attr_last_reset = date - timedelta(days=1)
-        else:
-            _attr_last_reset = None
+  @property
+  def last_reset(self) -> datetime | None:
+    """Return the time when the sensor was last reset, if any."""
+    data = self.getData("daily_usage")
+    if data is not None and len(data) > 0 and "usage" in data[-1]:
+      date = data[-1]["readTime"]
+      _attr_last_reset = date - timedelta(days=1)
+    else:
+      _attr_last_reset = None
 
-        return _attr_last_reset
+    return _attr_last_reset
 
-    def customAttributes(self):
-        """Return the state attributes."""
-        # data = self.getData("daily_usage")
-        # date = data[-1]["readTime"]
-        # last_reset = date - timedelta(days=1)
+  def customAttributes(self):
+    """Return the state attributes."""
+    # data = self.getData("daily_usage")
+    # date = data[-1]["readTime"]
+    # last_reset = date - timedelta(days=1)
 
-        attributes = {}
-        # attributes["state_class"] = SensorStateClass.TOTAL_INCREASING
-        # attributes["date"] = date
-        # attributes["last_reset"] = last_reset
-        return attributes
+    attributes = {}
+    # attributes["state_class"] = SensorStateClass.TOTAL_INCREASING
+    # attributes["date"] = date
+    # attributes["last_reset"] = last_reset
+    return attributes
 
 
 class FplDailyReceivedKWHSensor(FplEnergyEntity):
-    """Daily received Kwh sensor."""
+  """Daily received Kwh sensor."""
 
-    def __init__(self, coordinator, config, account):
-        """Initialize the class."""
-        super().__init__(coordinator, config, account, "Daily Received KWH")
+  def __init__(self, coordinator, config, account):
+    """Initialize the class."""
+    super().__init__(coordinator, config, account, "Daily Received KWH")
 
-    # _attr_state_class = SensorStateClass.TOTAL_INCREASING
+  # _attr_state_class = SensorStateClass.TOTAL_INCREASING
 
-    @property
-    def native_value(self):
-        """Return the value reported by the sensor."""
-        data = self.getData("daily_usage")
+  @property
+  def native_value(self):
+    """Return the value reported by the sensor."""
+    data = self.getData("daily_usage")
 
-        if data is not None and len(data) > 0 and "netReceivedKwh" in data[-1]:
-            self._attr_native_value = data[-1]["netReceivedKwh"]
+    if data is not None and len(data) > 0 and "netReceivedKwh" in data[-1]:
+      self._attr_native_value = data[-1]["netReceivedKwh"]
 
-        return self._attr_native_value
+    return self._attr_native_value
 
-    def customAttributes(self):
-        """Return the state attributes."""
-        data = self.getData("daily_usage")
-        attributes = {}
+  def customAttributes(self):
+    """Return the state attributes."""
+    data = self.getData("daily_usage")
+    attributes = {}
 
-        if data is not None and len(data) > 0 and "readTime" in data[-1]:
-            date = data[-1]["readTime"]
-            # last_reset = date - timedelta(days=1)
-            attributes["date"] = date
-            # attributes["last_reset"] = last_reset
-        return attributes
+    if data is not None and len(data) > 0 and "readTime" in data[-1]:
+      date = data[-1]["readTime"]
+      # last_reset = date - timedelta(days=1)
+      attributes["date"] = date
+      # attributes["last_reset"] = last_reset
+    return attributes
 
 
 class FplDailyDeliveredKWHSensor(FplEnergyEntity):
-    """Daily delivered Kwh sensor."""
+  """Daily delivered Kwh sensor."""
 
-    # _attr_state_class = SensorStateClass.TOTAL_INCREASING
+  # _attr_state_class = SensorStateClass.TOTAL_INCREASING
 
-    def __init__(self, coordinator, config, account):
-        """Initialize the class."""
-        super().__init__(coordinator, config, account, "Daily Delivered KWH")
+  def __init__(self, coordinator, config, account):
+    """Initialize the class."""
+    super().__init__(coordinator, config, account, "Daily Delivered KWH")
 
-    @property
-    def native_value(self):
-        """Return the value reported by the sensor."""
-        data = self.getData("daily_usage")
+  @property
+  def native_value(self):
+    """Return the value reported by the sensor."""
+    data = self.getData("daily_usage")
 
-        if data is not None and len(data) > 0 and "netDeliveredKwh" in data[-1]:
-            self._attr_native_value = data[-1]["netDeliveredKwh"]
+    if data is not None and len(data) > 0 and "netDeliveredKwh" in data[-1]:
+      self._attr_native_value = data[-1]["netDeliveredKwh"]
 
-        return self._attr_native_value
+    return self._attr_native_value
 
-    def customAttributes(self):
-        """Return the state attributes."""
-        data = self.getData("daily_usage")
-        attributes = {}
-        if data is not None and len(data) > 0 and "readTime" in data[-1]:
-            date = data[-1]["readTime"]
-            # last_reset = date - timedelta(days=1)
-            attributes["date"] = date
-            # attributes["last_reset"] = last_reset
-        return attributes
+  def customAttributes(self):
+    """Return the state attributes."""
+    data = self.getData("daily_usage")
+    attributes = {}
+    if data is not None and len(data) > 0 and "readTime" in data[-1]:
+      date = data[-1]["readTime"]
+      # last_reset = date - timedelta(days=1)
+      attributes["date"] = date
+      # attributes["last_reset"] = last_reset
+    return attributes

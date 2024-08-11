@@ -10,12 +10,12 @@ DOMAIN_DATA = f"{DOMAIN}_data"
 VERSION = "0.0.1"
 PLATFORMS = ["sensor"]
 REQUIRED_FILES = [
-    ".translations/en.json",
-    "binary_sensor.py",
-    "const.py",
-    "config_flow.py",
-    "manifest.json",
-    "sensor.py",
+  ".translations/en.json",
+  "binary_sensor.py",
+  "const.py",
+  "config_flow.py",
+  "manifest.json",
+  "sensor.py",
 ]
 ISSUE_URL = "https://github.com/tekHudson/hass-fpl-component/issues"
 ATTRIBUTION = "Data provided by FPL."

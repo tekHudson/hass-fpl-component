@@ -1,36 +1,36 @@
 """Sensor platform for custom_components/hass-fpl-component."""
 
 from .sensor_KWHSensor import (
-    ProjectedKWHSensor,
-    DailyAverageKWHSensor,
-    BillToDateKWHSensor,
-    NetReceivedKWHSensor,
-    NetDeliveredKWHSensor,
+  ProjectedKWHSensor,
+  DailyAverageKWHSensor,
+  BillToDateKWHSensor,
+  NetReceivedKWHSensor,
+  NetDeliveredKWHSensor,
 )
 from .sensor_DatesSensor import (
-    CurrentBillDateSensor,
-    NextBillDateSensor,
-    ServiceDaysSensor,
-    AsOfDaysSensor,
-    RemainingDaysSensor,
+  CurrentBillDateSensor,
+  NextBillDateSensor,
+  ServiceDaysSensor,
+  AsOfDaysSensor,
+  RemainingDaysSensor,
 )
 from .sensor_ProjectedBillSensor import (
-    BillToDateSensor,
-    FplProjectedBillSensor,
-    ProjectedBudgetBillSensor,
-    ProjectedActualBillSensor,
-    DeferedAmountSensor,
+  BillToDateSensor,
+  FplProjectedBillSensor,
+  ProjectedBudgetBillSensor,
+  ProjectedActualBillSensor,
+  DeferedAmountSensor,
 )
 from .sensor_AverageDailySensor import (
-    DailyAverageSensor,
-    BudgetDailyAverageSensor,
-    ActualDailyAverageSensor,
+  DailyAverageSensor,
+  BudgetDailyAverageSensor,
+  ActualDailyAverageSensor,
 )
 from .sensor_DailyUsageSensor import (
-    FplDailyUsageKWHSensor,
-    FplDailyUsageSensor,
-    FplDailyDeliveredKWHSensor,
-    FplDailyReceivedKWHSensor,
+  FplDailyUsageKWHSensor,
+  FplDailyUsageSensor,
+  FplDailyDeliveredKWHSensor,
+  FplDailyReceivedKWHSensor,
 )
 
 from .sensor_BalanceSensor import BalanceSensor
@@ -44,12 +44,12 @@ sensors = {}
 
 
 def registerSensor(sensor, regions):
-    """Register all available sensors."""
-    for region in regions:
-        if region in sensors:
-            sensors[region].append(sensor)
-        else:
-            sensors[region] = [sensor]
+  """Register all available sensors."""
+  for region in regions:
+    if region in sensors:
+      sensors[region].append(sensor)
+    else:
+      sensors[region] = [sensor]
 
 
 # bill sensors
@@ -91,16 +91,16 @@ registerSensor(BalanceSensor, ONLY_MAINREGION)
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
-    """Set up sensor platform."""
+  """Set up sensor platform."""
 
-    accounts = entry.data.get(CONF_ACCOUNTS)
-    territory = entry.data.get(CONF_TERRITORY)
+  accounts = entry.data.get(CONF_ACCOUNTS)
+  territory = entry.data.get(CONF_TERRITORY)
 
-    coordinator = hass.data[DOMAIN][entry.entry_id]
-    fpl_accounts = []
+  coordinator = hass.data[DOMAIN][entry.entry_id]
+  fpl_accounts = []
 
-    for account in accounts:
-        for sensor in sensors[territory]:
-            fpl_accounts.append(sensor(coordinator, entry, account))
+  for account in accounts:
+    for sensor in sensors[territory]:
+      fpl_accounts.append(sensor(coordinator, entry, account))
 
-    async_add_devices(fpl_accounts)
+  async_add_devices(fpl_accounts)
