@@ -1,7 +1,7 @@
 {
   "name": "HASS FPL Component",
   "filename": "hass-fpl-component.zip",
-  "homeassistant": "2024.7.4",
+  "homeassistant": "2024.8.1",
   "render_readme": true,
   "zip_release": true
 }
