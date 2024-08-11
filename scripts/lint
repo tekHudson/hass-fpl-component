@@ -4,4 +4,5 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-ruff check . --fix
+# Can add `--fix` to auto fix below
+ruff check .
