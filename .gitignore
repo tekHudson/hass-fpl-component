@@ -8,10 +8,13 @@ __pycache__
 
 # misc
 .coverage
-.vscode
+.vscode/settings.json
 coverage.xml
 
 
 # Home Assistant configuration
 config/*
 !config/configuration.yaml
+
+# HASS FPL Component
+custom_components/hass-fpl-component/secrets.py
