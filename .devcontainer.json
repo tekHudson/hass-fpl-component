@@ -1,6 +1,6 @@
 {
   "name": "tekHudson/custom_components/hass-fpl-component",
-  "image": "mcr.microsoft.com/devcontainers/python:3.12-bullseye",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12",
   "postCreateCommand": "scripts/setup",
   "forwardPorts": [
     8123

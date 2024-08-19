@@ -2,16 +2,30 @@
 #
 TIMEOUT = 5
 API_HOST = "https://www.fpl.com"
+URL_TERRITORY = API_HOST + "/cs/customer/v1/territoryid/public/territory"
+URL_LOGIN = API_HOST + "/api/resources/login"
+URL_BUDGET_BILLING_GRAPH = API_HOST + "/api/resources/account/{account}/budgetBillingGraph"
+URL_RESOURCES_PROJECTED_BILL = (API_HOST
+  + "/api/resources/account/{account}/projectedBill"
+  + "?premiseNumber={premise}&lastBilledDate={lastBillDate}")
+URL_ENERGY_SERVICE = API_HOST + "/dashboard-api/resources/account/{account}/energyService/{account}"
+URL_APPLIANCE_USAGE = API_HOST + "/dashboard-api/resources/account/{account}/applianceUsage/{account}"
+URL_BUDGET_BILLING_PREMISE_DETAILS = API_HOST + "/api/resources/account/{account}/budgetBillingGraph/premiseDetails"
+URL_RESOURCES_HEADER = API_HOST + "/api/resources/header"
+URL_LOGOUT = API_HOST + "/api/resources/logout"
+URL_RESOURCES_ACCOUNT = API_HOST + "/api/resources/account/{account}"
+URL_BALANCE = API_HOST + "/api/resources/account/{account}/balance?count=-1"
+URL_NW_GET_ACCOUNT_LIST = API_HOST + "/cs/gulf/ssp/v1/profile/accounts/list"
+URL_NW_GET_ACCOUNT_SUMMARY = API_HOST + "/cs/gulf/ssp/v1/accountservices/account/{account}/accountSummary?balance=y"
 
 # Base component constants
-NAME = "FPL Integration"
-DOMAIN = "fpl"
+NAME = "HASS FPL Component"
+DOMAIN = "hass-fpl-component"
 DOMAIN_DATA = f"{DOMAIN}_data"
 VERSION = "0.0.1"
 PLATFORMS = ["sensor"]
 REQUIRED_FILES = [
   ".translations/en.json",
-  "binary_sensor.py",
   "const.py",
   "config_flow.py",
   "manifest.json",
@@ -21,9 +35,7 @@ ISSUE_URL = "https://github.com/tekHudson/hass-fpl-component/issues"
 ATTRIBUTION = "Data provided by FPL."
 
 # Platforms
-BINARY_SENSOR = "binary_sensor"
 SENSOR = "sensor"
-SWITCH = "switch"
 PLATFORMS = [SENSOR]
 
 # Device classes

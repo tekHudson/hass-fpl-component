@@ -10,32 +10,25 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import Throttle
 from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
-
 from .fplapi import FplApi
-from .const import (
-  DOMAIN,
-  DOMAIN_DATA,
-  PLATFORMS,
-  STARTUP_MESSAGE,
-)
-
+from .const import DOMAIN, DOMAIN_DATA, PLATFORMS, STARTUP_MESSAGE
 from .fplDataUpdateCoordinator import FplDataUpdateCoordinator
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=30)
-
 _LOGGER = logging.getLogger(__package__)
-
+MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=30)
 
 class FplData:
   """This class handle communication and stores the data."""
 
   def __init__(self, hass, client):
+    _LOGGER.debug("__init__")
     """Initialize the class."""
     self.hass = hass
     self.client = client
 
   @Throttle(MIN_TIME_BETWEEN_UPDATES)
   async def update_data(self):
+    _LOGGER.debug("update_data")
     """Update data."""
     # This is where the main logic to update platform data goes.
     try:
@@ -46,11 +39,12 @@ class FplData:
 
 
 async def async_setup(hass: HomeAssistant, config: Config) -> bool:
+  _LOGGER.debug("async_setup")
   """Set up configured Fpl."""
   return True
 
-
 async def async_setup_entry(hass, entry):
+  _LOGGER.debug("async_setup_entry")
   """Set up this integration using UI."""
   if hass.data.get(DOMAIN) is None:
     hass.data.setdefault(DOMAIN, {})
@@ -63,45 +57,33 @@ async def async_setup_entry(hass, entry):
   # Configure the client.
   _LOGGER.info("Configuring the client")
   session = async_get_clientsession(hass)
+  _LOGGER.info(f"username = {username}")
+  _LOGGER.info(f"password = {password}")
   client = FplApi(username, password, session, hass.loop)
 
+  _LOGGER.info("Calling FplDataUpdateCoordinator")
   coordinator = FplDataUpdateCoordinator(hass, client=client)
   await coordinator.async_refresh()
 
   hass.data[DOMAIN][entry.entry_id] = coordinator
 
-  for platform in PLATFORMS:
-    if entry.options.get(platform, True):
-      coordinator.platforms.append(platform)
-      hass.async_add_job(
-        hass.config_entries.async_forward_entry_setup(entry, platform)
-      )
-
   # Set up Fpl as config entry.
-
-  entry.add_update_listener(async_reload_entry)
+  await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
   return True
 
-
-async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-  """Reload config entry."""
-  await async_unload_entry(hass, entry)
-  await async_setup_entry(hass, entry)
-
-
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+  _LOGGER.debug("async_unload_entry")
   """Handle removal of an entry."""
-  coordinator = hass.data[DOMAIN][entry.entry_id]
-  unloaded = all(
-    await asyncio.gather(
-      *[
-        hass.config_entries.async_forward_entry_unload(entry, platform)
-        for platform in PLATFORMS
-        if platform in coordinator.platforms
-      ]
-    )
-  )
-  if unloaded:
+  _LOGGER.info('async_unload_entry')
+  unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+  if unload_ok:
     hass.data[DOMAIN].pop(entry.entry_id)
 
-  return unloaded
+  return unload_ok
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+  _LOGGER.debug("async_reload_entry")
+  """Reload config entry."""
+  _LOGGER.info('async_reload_entry')
+  await async_unload_entry(hass, entry)
+  await async_setup_entry(hass, entry)

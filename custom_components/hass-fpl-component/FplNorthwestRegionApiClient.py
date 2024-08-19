@@ -4,7 +4,7 @@ import logging
 import async_timeout
 import boto3
 
-from .const import TIMEOUT, API_HOST
+from .const import TIMEOUT, URL_NW_GET_ACCOUNT_LIST, URL_NW_GET_ACCOUNT_SUMMARY
 from .aws_srp import AWSSRP
 from .const import LOGIN_RESULT_OK
 
@@ -20,6 +20,7 @@ class FplNorthwestRegionApiClient:
   """FPL Northwest Api client."""
 
   def __init__(self, username, password, loop, session) -> None:
+    _LOGGER.debug("FplNorthwestRegionApiClient __init__")
     """Initialize the class."""
     self.session = session
     self.username = username
@@ -99,12 +100,12 @@ class FplNorthwestRegionApiClient:
     """Return the open accounts."""
 
     result = []
-    URL = API_HOST + "/cs/gulf/ssp/v1/profile/accounts/list"
+
 
     headers = {"Authorization": f"Bearer {self.id_token}"}
 
     async with async_timeout.timeout(TIMEOUT):
-      response = await self.session.get(URL, headers=headers)
+      response = await self.session.get(URL_NW_GET_ACCOUNT_LIST, headers=headers)
 
     if response.status == 200:
       data = await response.json()
@@ -121,14 +122,9 @@ class FplNorthwestRegionApiClient:
   async def update(self, account):
     """Return the data collected from FPL."""
 
-    URL = (
-      API_HOST
-      + f"/cs/gulf/ssp/v1/accountservices/account/{account}/accountSummary?balance=y"
-    )
-
     headers = {"Authorization": f"Bearer {self.id_token}"}
     async with async_timeout.timeout(TIMEOUT):
-      response = await self.session.get(URL, headers=headers)
+      response = await self.session.get(URL_NW_GET_ACCOUNT_SUMMARY, headers=headers)
 
     result = {}
 

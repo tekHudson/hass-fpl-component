@@ -8,52 +8,36 @@ import async_timeout
 
 
 from .const import (
-  API_HOST,
   LOGIN_RESULT_FAILURE,
   LOGIN_RESULT_INVALIDPASSWORD,
   LOGIN_RESULT_INVALIDUSER,
   LOGIN_RESULT_OK,
   TIMEOUT,
+  URL_LOGIN,
+  URL_BUDGET_BILLING_GRAPH,
+  URL_RESOURCES_PROJECTED_BILL,
+  URL_ENERGY_SERVICE,
+  URL_APPLIANCE_USAGE,
+  URL_BUDGET_BILLING_PREMISE_DETAILS,
+  URL_RESOURCES_HEADER,
+  URL_LOGOUT,
+  URL_RESOURCES_ACCOUNT,
+  URL_BALANCE,
 )
 
 STATUS_CATEGORY_OPEN = "OPEN"
-
-URL_LOGIN = API_HOST + "/api/resources/login"
-
-URL_BUDGET_BILLING_GRAPH = (
-  API_HOST + "/api/resources/account/{account}/budgetBillingGraph"
-)
-
-URL_RESOURCES_PROJECTED_BILL = (
-  API_HOST
-  + "/api/resources/account/{account}/projectedBill"
-  + "?premiseNumber={premise}&lastBilledDate={lastBillDate}"
-)
-
-
-URL_ENERGY_SERVICE = (
-  API_HOST + "/dashboard-api/resources/account/{account}/energyService/{account}"
-)
-
-URL_APPLIANCE_USAGE = (
-  API_HOST + "/dashboard-api/resources/account/{account}/applianceUsage/{account}"
-)
-
-URL_BUDGET_BILLING_PREMISE_DETAILS = (
-  API_HOST + "/api/resources/account/{account}/budgetBillingGraph/premiseDetails"
-)
-
-
 ENROLLED = "ENROLLED"
 NOTENROLLED = "NOTENROLLED"
 
 _LOGGER = logging.getLogger(__package__)
 
-
 class FplMainRegionApiClient:
   """Fpl Main Region Api Client."""
 
   def __init__(self, username, password, loop, session) -> None:
+    _LOGGER.debug("FplMainRegionApiClient __init__")
+    _LOGGER.debug(f"{username}")
+    _LOGGER.debug(f"{password}")
     """Initialize the class."""
     self.session = session
     self.username = username
@@ -62,9 +46,11 @@ class FplMainRegionApiClient:
 
   async def login(self):
     """Login into fpl."""
-
     # login and get account information
 
+    _LOGGER.debug(f"{URL_LOGIN}")
+    _LOGGER.debug(f"{self.username}")
+    _LOGGER.debug(f"{self.password}")
     async with async_timeout.timeout(TIMEOUT):
       response = await self.session.get(
         URL_LOGIN,
@@ -86,11 +72,12 @@ class FplMainRegionApiClient:
     return LOGIN_RESULT_FAILURE
 
   async def get_open_accounts(self):
+    _LOGGER.debug("FplMainRegionApiClient. get_open_accounts")
     """Get open accounts. Returns array with active account numbers."""
     result = []
-    URL = API_HOST + "/api/resources/header"
+
     async with async_timeout.timeout(TIMEOUT):
-      response = await self.session.get(URL)
+      response = await self.session.get(URL_RESOURCES_HEADER)
 
     json_data = await response.json()
     accounts = json_data["data"]["accounts"]["data"]["data"]
@@ -105,7 +92,6 @@ class FplMainRegionApiClient:
     """Log out from FPL."""
     _LOGGER.info("Logging out")
 
-    URL_LOGOUT = API_HOST + "/api/resources/logout"
     try:
       async with async_timeout.timeout(TIMEOUT):
         await self.session.get(URL_LOGOUT)
@@ -113,86 +99,86 @@ class FplMainRegionApiClient:
       _LOGGER.error(e)
 
   async def update(self, account) -> dict:
+    _LOGGER.debug("FplMainRegionApiClient.update")
     """Get data from resources endpoint."""
     data = {}
 
-    URL_RESOURCES_ACCOUNT = API_HOST + "/api/resources/account/{account}"
+    account_data = await self.__get_account_data(account)
 
+    location_and_date_data = await self.__build_location_and_date_data(account_data)
+    data.update(location_and_date_data)
+
+    programs_data = await self.__get_programs_data(account, account_data)
+    data.update(programs_data)
+
+    # projected_bill_data = await self.__get_projected_bill_data(account, account_data)
+    # data.update(projected_bill_data)
+
+    # daily_data =  await self.__getDailyDataFromEnergyService(account, premise, currentBillDate)
+    # data.update(daily_data)
+
+    # hourly_data = await self.__getHourlyDataFromEnergyService(account, premise, currentBillDate)
+    # data.update(hourly_data)
+
+    # app_usage_data = await self.__getDataFromApplianceUsage(account, currentBillDate))
+    # data.update(app_usage_data)
+
+    # balance_data = await self.__getDataFromBalance(account)
+    # data.update(balance_data)
+
+    return data
+
+  async def __get_account_data(self, account):
     async with async_timeout.timeout(TIMEOUT):
-      response = await self.session.get(
-        URL_RESOURCES_ACCOUNT.format(account=account)
-      )
-    account_data = (await response.json())["data"]
+      response = await self.session.get(URL_RESOURCES_ACCOUNT.format(account=account))
 
-    premise = account_data.get("premiseNumber").zfill(9)
+    return (await response.json())["data"]
 
-    data["meterSerialNo"] = account_data["meterSerialNo"]
+  async def __build_location_and_date_data(self, account_data):
+    data = {}
 
-    # currentBillDate
-    currentBillDate = datetime.strptime(
+    current_bill_date = datetime.strptime(
       account_data["currentBillDate"].replace("-", "").split("T")[0], "%Y%m%d"
     ).date()
 
-    # nextBillDate
-    nextBillDate = datetime.strptime(
+    next_bill_date = datetime.strptime(
       account_data["nextBillDate"].replace("-", "").split("T")[0], "%Y%m%d"
     ).date()
 
-    data["current_bill_date"] = str(currentBillDate)
-    data["next_bill_date"] = str(nextBillDate)
+    data["premise_number"] = account_data.get("premiseNumber").zfill(9)
+    data["meter_serial_no"] = account_data["meterSerialNo"]
+    data["current_bill_date"] = str(current_bill_date)
+    data["next_bill_date"] = str(next_bill_date)
+    data["service_days"] = (next_bill_date - current_bill_date).days
+    data["as_of_days"] = (datetime.now().date() - current_bill_date).days
+    data["remaining_days"] = (next_bill_date - datetime.now().date()).days
 
-    today = datetime.now().date()
+    return data
 
-    data["service_days"] = (nextBillDate - currentBillDate).days
-    data["as_of_days"] = (today - currentBillDate).days
-    data["remaining_days"] = (nextBillDate - today).days
-
-    # zip code
-    # zip_code = accountData["serviceAddress"]["zip"]
-
-    # projected bill
-    pbData = await self.__getFromProjectedBill(account, premise, currentBillDate)
-    data.update(pbData)
-
-    # programs
-    programsData = account_data["programs"]["data"]
-
+  async def __get_programs_data(self, account, account_data):
+    data = {}
     programs = []
-    _LOGGER.info("Getting Programs")
-    for program in programsData:
+    programs_data = account_data["programs"]["data"]
+
+    for program in programs_data:
       if "enrollmentStatus" in program:
         key = program["name"]
         programs[key] = program["enrollmentStatus"] == ENROLLED
 
-    def hasProgram(programName) -> bool:
-      return programName in programs and programs[programName]
+    def hasProgram(program_name) -> bool:
+      return program_name in programs and programs[program_name]
 
     # Budget Billing program
+    data["budget_bill"] = False
+
     if hasProgram("BBL"):
       data["budget_bill"] = True
-      bbl_data = await self.__getBBL_async(account, data)
+      bbl_data = await self.__get_bbl_program_info(account, account_data)
       data.update(bbl_data)
-    else:
-      data["budget_bill"] = False
-
-    # Get data from energy service
-    data.update(
-      await self.__getDataFromEnergyService(account, premise, currentBillDate)
-    )
-
-    # Get data from energy service ( hourly )
-    # data.update(
-    #  await self.__getDataFromEnergyServiceHourly(
-    #    account, premise, currentBillDate
-    #  )
-    # )
-
-    data.update(await self.__getDataFromApplianceUsage(account, currentBillDate))
-    data.update(await self.__getDataFromBalance(account))
 
     return data
 
-  async def __getFromProjectedBill(self, account, premise, currentBillDate) -> dict:
+  async def __get_projected_bill_data(self, account_data, currentBillDate) -> dict:
     """Get data from projected bill endpoint."""
     data = {}
 
@@ -224,7 +210,7 @@ class FplMainRegionApiClient:
 
     return data
 
-  async def __getBBL_async(self, account, projectedBillData) -> dict:
+  async def __get_bbl_program_info(self, account, projectedBillData) -> dict:
     """Get budget billing data."""
     _LOGGER.info("Getting budget billing data")
     data = {}
@@ -258,7 +244,6 @@ class FplMainRegionApiClient:
 
           data["budget_billing_daily_avg"] = bbDailyAvg
           data["budget_billing_bill_to_date"] = bbAsOfDateAmt
-
           data["budget_billing_projected_bill"] = float(projectedBudgetBill)
 
       async with async_timeout.timeout(TIMEOUT):
@@ -274,7 +259,26 @@ class FplMainRegionApiClient:
 
     return data
 
-  async def __getDataFromEnergyService(self, account, premise, lastBilledDate) -> dict:
+  async def __getHourlyDataFromEnergyService(self, account, premise, lastBilledDate) -> dict:
+    JSON = {
+      "status":2,
+      "channel":"WEB",
+      "amrFlag":"Y",
+      "accountType":"RESIDENTIAL",
+      "revCode":"1",
+      "premiseNumber": premise,
+      "meterNo": meter,
+      "projectedBillFlag": False,
+      "billComparisionFlag": False,
+      "monthlyFlag": False,
+      "frequencyType":"Hourly",
+      # "lastBilledDate":"",
+      "applicationPage":"resDashBoard",
+      # "startDate":"08172024",
+      # "endDate":""
+    }
+
+  async def __getDailyDataFromEnergyService(self, account, premise, lastBilledDate) -> dict:
     _LOGGER.info("Getting energy service data")
 
     date = str(lastBilledDate.strftime("%m%d%Y"))
@@ -293,10 +297,6 @@ class FplMainRegionApiClient:
       "lastBilledDate": date,
       "applicationPage": "resDashBoard",
     }
-    URL_ENERGY_SERVICE = (
-      API_HOST
-      + "/dashboard-api/resources/account/{account}/energyService/{account}"
-    )
 
     data = {}
     try:
@@ -387,7 +387,6 @@ class FplMainRegionApiClient:
 
     data = {}
 
-    URL_BALANCE = API_HOST + "/api/resources/account/{account}/balance?count=-1"
 
     try:
       async with async_timeout.timeout(TIMEOUT):

@@ -1,14 +1,13 @@
 """Home Assistant Fpl integration Config Flow."""
+import sys
+import logging
+
 from collections import OrderedDict
-
-import voluptuous as vol
-
+from voluptuous import Schema, Required
 from homeassistant import config_entries
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.core import callback
-
 from homeassistant.const import CONF_USERNAME, CONF_PASSWORD, CONF_NAME
-
 from .const import (
   CONF_ACCOUNTS,
   CONF_TERRITORY,
@@ -23,6 +22,8 @@ from .const import (
 
 from .fplapi import FplApi
 
+_LOGGER = logging.getLogger(__package__)
+
 try:
   from .secrets import DEFAULT_CONF_PASSWORD, DEFAULT_CONF_USERNAME
 except:
@@ -36,22 +37,24 @@ def configured_instances(hass):
     entites.append(f"{entry.data.get(CONF_USERNAME)}")
   return set(entites)
 
-
-class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
   """Fpl Config Flow Handler."""
 
   VERSION = 1
   CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
   def __init__(self):
+    _LOGGER.info("ConfigFlow #__init__")
     """Initialize the class."""
     self._errors = {}
 
-  async def async_step_user(self, user_input=None):  # pylint: disable=dangerous-default-value
+  async def async_step_user(self, user_input):  # pylint: disable=dangerous-default-value
+    _LOGGER.info("ConfigFlow #async_step_user")
     """Handle a flow initialized by the user."""
     self._errors = {}
 
     if user_input is not None:
+      _LOGGER.info(f"user_input = {user_input}")
       username = user_input[CONF_USERNAME]
       password = user_input[CONF_PASSWORD]
 
@@ -90,9 +93,11 @@ class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     return await self._show_config_form(user_input)
 
   async def _show_config_form(self, user_input):
+    _LOGGER.info("ConfigFlow #_show_config_form")
     """Show the configuration form to edit location data."""
     username = DEFAULT_CONF_USERNAME
     password = DEFAULT_CONF_PASSWORD
+    _LOGGER.info(f"user_input = {user_input}")
 
     if user_input is not None:
       if CONF_USERNAME in user_input:
@@ -101,16 +106,14 @@ class FplFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         password = user_input[CONF_PASSWORD]
 
     data_schema = OrderedDict()
-    data_schema[vol.Required(CONF_USERNAME, default=username)] = str
-    data_schema[vol.Required(CONF_PASSWORD, default=password)] = str
+    data_schema[Required(CONF_USERNAME, default=username)] = str
+    data_schema[Required(CONF_PASSWORD, default=password)] = str
 
-    return self.async_show_form(
-      step_id="user",
-      data_schema=vol.Schema(data_schema),
-      errors=self._errors
-    )
+    _LOGGER.info(f"data_schema = {data_schema}")
+    return self.async_show_form(step_id="user", data_schema=Schema(data_schema), errors=self._errors)
 
-  async def async_step_import(self, user_input):  # pylint: disable=unused-argument
+  async def async_step_import(self, _):  # pylint: disable=unused-argument
+    _LOGGER.info("ConfigFlow #async_step_import")
     """Import a config entry.
 
     Special type of import, we're not actually going to store any data.

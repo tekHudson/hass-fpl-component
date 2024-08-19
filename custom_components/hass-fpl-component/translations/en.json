@@ -1,6 +1,16 @@
 {
   "config": {
     "title": "Florida Power & Light",
+    "abort": {
+      "single_instance_allowed": "Only a single configuration of Fpl is allowed."
+    },
+    "error": {
+      "failure": "An error ocurred, please check the logs",
+      "auth": "Username/Password is wrong.",
+      "name_exists": "Configuration already exists.",
+      "invalid_username": "Invalid Email",
+      "invalid_password": "Invalid Password"
+    },
     "step": {
       "user": {
         "title": "Florida Power & Light",
@@ -11,16 +21,6 @@
           "password": "Password"
         }
       }
-    },
-    "error": {
-      "failure": "An error ocurred, please check the logs",
-      "auth": "Username/Password is wrong.",
-      "name_exists": "Configuration already exists.",
-      "invalid_username": "Invalid Email",
-      "invalid_password": "Invalid Password"
-    },
-    "abort": {
-      "single_instance_allowed": "Only a single configuration of Fpl is allowed."
     }
   }
 }
