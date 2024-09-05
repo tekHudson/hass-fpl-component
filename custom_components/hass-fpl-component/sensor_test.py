@@ -28,17 +28,6 @@ class TestSensor(FplEnergyEntity):
 
     return STATE_UNKNOWN
 
-  @property
-  def last_reset(self) -> datetime | None:
-    """Return the time when the sensor was last reset, if any."""
-    last_reset = None
-    data = self.getData("daily_usage")
-    if len(data) > 0 and "readTime" in data[-1]:
-      date = data[-1]["readTime"]
-      last_reset = datetime.combine(date, datetime.min.time())
-      # print("setting last reset {last_reset}")
-    return last_reset
-
   def customAttributes(self):
     """Return the state attributes."""
     # print("setting custom attributes")

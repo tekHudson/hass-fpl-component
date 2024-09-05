@@ -90,14 +90,10 @@ class FplApi:
     login_result = await self.apiClient.login()
 
     if login_result == LOGIN_RESULT_OK:
-      _LOGGER.debug(f"login_result= {login_result}")
-
       accounts = await self.apiClient.get_open_accounts()
-      _LOGGER.debug(f"accounts= {accounts}")
 
       data[CONF_ACCOUNTS] = accounts
       for account in accounts:
-        _LOGGER.debug(f"account= {account}")
         data[account] = await self.apiClient.update(account)
 
       await self.apiClient.logout()

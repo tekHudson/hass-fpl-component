@@ -14,7 +14,6 @@ class FplDataUpdateCoordinator(DataUpdateCoordinator):
   """Class to manage fetching data from the API."""
 
   def __init__(self, hass: HomeAssistant, client: FplApi) -> None:
-    _LOGGER.debug("FplDataUpdateCoordinator #__init__")
     """Initialize the class."""
     self.api = client
     self.platforms = []
@@ -22,7 +21,6 @@ class FplDataUpdateCoordinator(DataUpdateCoordinator):
     super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
 
   async def _async_update_data(self):
-    _LOGGER.debug("FplDataUpdateCoordinator #_async_update_data")
     """Update data via library."""
     try:
       return await self.api.async_get_data()

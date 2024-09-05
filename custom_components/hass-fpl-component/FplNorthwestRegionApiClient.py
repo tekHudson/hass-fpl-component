@@ -20,7 +20,6 @@ class FplNorthwestRegionApiClient:
   """FPL Northwest Api client."""
 
   def __init__(self, username, password, loop, session) -> None:
-    _LOGGER.debug("FplNorthwestRegionApiClient __init__")
     """Initialize the class."""
     self.session = session
     self.username = username

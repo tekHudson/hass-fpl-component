@@ -1,39 +1,38 @@
 """Sensor platform for custom_components/hass-fpl-component."""
 
-from .sensor_KWHSensor import (
+from .sensor_KWHSensors import (
   ProjectedKWHSensor,
   DailyAverageKWHSensor,
   BillToDateKWHSensor,
   NetReceivedKWHSensor,
   NetDeliveredKWHSensor,
+  DailyUsageKWHSensor,
+  DailyReceivedKWHSensor,
+  DailyDeliveredKWHSensor,
 )
-from .sensor_DatesSensor import (
+from .sensor_DatesSensors import (
   CurrentBillDateSensor,
   NextBillDateSensor,
+)
+from .sensor_DaysSensors import (
   ServiceDaysSensor,
   AsOfDaysSensor,
   RemainingDaysSensor,
 )
-from .sensor_ProjectedBillSensor import (
-  BillToDateSensor,
-  FplProjectedBillSensor,
-  ProjectedBudgetBillSensor,
-  ProjectedActualBillSensor,
-  DeferedAmountSensor,
-)
-from .sensor_AverageDailySensor import (
+from .sensor_MonetarySensors import (
+  BalanceSensor,
   DailyAverageSensor,
   BudgetDailyAverageSensor,
   ActualDailyAverageSensor,
-)
-from .sensor_DailyUsageSensor import (
-  FplDailyUsageKWHSensor,
   FplDailyUsageSensor,
-  FplDailyDeliveredKWHSensor,
-  FplDailyReceivedKWHSensor,
+  FplProjectedBillSensor,
+  DeferedAmountSensor,
+  ProjectedBudgetBillSensor,
+  ProjectedActualBillSensor,
+  BillToDateSensor,
 )
 
-from .sensor_BalanceSensor import BalanceSensor
+from .sensor_MonetarySensors import BalanceSensor
 
 from .const import CONF_ACCOUNTS, CONF_TERRITORY, DOMAIN, FPL_MAINREGION, FPL_NORTHWEST
 
@@ -62,13 +61,10 @@ registerSensor(ProjectedActualBillSensor, ONLY_MAINREGION)
 registerSensor(DeferedAmountSensor, ONLY_MAINREGION)
 
 
-# usage sensors
+# monetary sensors
 registerSensor(DailyAverageSensor, ONLY_MAINREGION)
 registerSensor(BudgetDailyAverageSensor, ONLY_MAINREGION)
 registerSensor(ActualDailyAverageSensor, ONLY_MAINREGION)
-
-registerSensor(FplDailyUsageSensor, ONLY_MAINREGION)
-registerSensor(FplDailyUsageKWHSensor, ONLY_MAINREGION)
 
 # date sensors
 registerSensor(CurrentBillDateSensor, ALL_REGIONS)
@@ -81,10 +77,12 @@ registerSensor(RemainingDaysSensor, ALL_REGIONS)
 registerSensor(ProjectedKWHSensor, ALL_REGIONS)
 registerSensor(DailyAverageKWHSensor, ONLY_MAINREGION)
 registerSensor(BillToDateKWHSensor, ALL_REGIONS)
+registerSensor(FplDailyUsageSensor, ONLY_MAINREGION)
 registerSensor(NetReceivedKWHSensor, ONLY_MAINREGION)
 registerSensor(NetDeliveredKWHSensor, ONLY_MAINREGION)
-registerSensor(FplDailyReceivedKWHSensor, ONLY_MAINREGION)
-registerSensor(FplDailyDeliveredKWHSensor, ONLY_MAINREGION)
+registerSensor(DailyUsageKWHSensor, ONLY_MAINREGION)
+registerSensor(DailyReceivedKWHSensor, ONLY_MAINREGION)
+registerSensor(DailyDeliveredKWHSensor, ONLY_MAINREGION)
 
 # Balance sensors
 registerSensor(BalanceSensor, ONLY_MAINREGION)
