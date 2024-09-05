@@ -244,6 +244,8 @@ class FplMainRegionApiClient:
 
         if monthly_usage_response_data != []:
           if monthly_usage_response_data.get("exceptionDetails", {}) == {}:
+            _LOGGER.debug(f'monthly_usage_response_data = {monthly_usage_response_data}') # TODO: Remove
+
             for monthly_data in monthly_usage_response_data:
               monthly_result = await self._build_monthly_usage(monthly_data)
               results['monthly_data'].append(monthly_result)
@@ -350,45 +352,36 @@ class FplMainRegionApiClient:
 
     return response_data
 
-  async def _build_monthly_usage(self, monthly_usage_data):
-    results = []
+  async def _build_monthly_usage(self, monthly_data):
+    bill_start_date = datetime.fromisoformat(monthly_data["billStartDate"]).date()
+    bill_end_date = datetime.fromisoformat(monthly_data["billEndDate"]).date()
 
-    _LOGGER.debug(f'monthly_usage_data = {monthly_usage_data}') # TODO: Remove
-
-
-      bill_start_date = datetime.fromisoformat(monthly_data["billStartDate"]).date()
-      bill_end_date = datetime.fromisoformat(monthly_data["billEndDate"]).date()
-
-      monthly_result = {
-        "bill_start_date": bill_start_date,                                                 # "2024-07-05T00:00:00.000",
-        "bill_end_date": bill_end_date,                                                     # "2024-08-05T00:00:00.000",
-        "billing_charge":           float(monthly_data.get("billingCharge", 0.0)),          # 90.07,
-        "temperature":              float(monthly_data.get("temperature", 0.0)),            # 91.0,
-        "humidity":                 float(monthly_data.get("humidity", 0.0)),               # 94.0,
-        "billed_kwh":               int(monthly_data.get("billedKwh", 0)),                  # 624,
-        "billing_days":             int(monthly_data.get("billingDays", 0)),                # 31,
-        "billing_month":            monthly_data.get("billingMonth", ""),                   # "Aug",
-        "billing_year":             int(monthly_data.get("billingYear", 0)),                # "2024",
-        "average_high_temperature": float(monthly_data.get("averageHighTemperature", 0.0)), # 91.0,
-        "average_low_temperature":  float(monthly_data.get("averageLowTemperature", 0.0)),  # 76.0,
-        "average_mid_temperature":  float(monthly_data.get("averageMidTemperature", 0.0)),  # 83.0,
-        "average_high_humidity":    float(monthly_data.get("averageHighHumidity", 0.0)),    # 96.0,
-        "average_low_humidity":     float(monthly_data.get("averageLowHumidity", 0.0)),     # 63.0,
-        "average_mid_humidity":     float(monthly_data.get("averageMidHumidity", 0.0)),     # 81.0,
-        "on_peak_kwh":              int(monthly_data.get("onPeakKwh", 0)),                  # 0,
-        "off_peak_kwh":             int(monthly_data.get("offPeakKwh", 0)),                 # 0,
-        "net_delivered":            int(monthly_data.get("netDelivered", 0)),               # 1243,
-        "net_received":             int(monthly_data.get("netReceived", 0)),                # 522,
-        "meter_number":             monthly_data.get("meterNumber", ""),                    # "KCD075N",
-        "meter_type":               monthly_data.get("meterType", ""),                      # "Y",
-        "reading":                  int(monthly_data.get("reading", 0)),                    # 26220,
-        "net_delivered_reading":    int(monthly_data.get("netDeliveredReading", 0)),        # 26220,
-        "net_received_reading":     int(monthly_data.get("netReceivedReading", 0)),         # 13539
-      }
-
-      results.append(monthly_result)
-
-    return results
+    return {
+      "bill_start_date": bill_start_date,                                                 # "2024-07-05T00:00:00.000",
+      "bill_end_date": bill_end_date,                                                     # "2024-08-05T00:00:00.000",
+      "billing_charge":           float(monthly_data.get("billingCharge", 0.0)),          # 90.07,
+      "temperature":              float(monthly_data.get("temperature", 0.0)),            # 91.0,
+      "humidity":                 float(monthly_data.get("humidity", 0.0)),               # 94.0,
+      "billed_kwh":               int(monthly_data.get("billedKwh", 0)),                  # 624,
+      "billing_days":             int(monthly_data.get("billingDays", 0)),                # 31,
+      "billing_month":            monthly_data.get("billingMonth", ""),                   # "Aug",
+      "billing_year":             int(monthly_data.get("billingYear", 0)),                # "2024",
+      "average_high_temperature": float(monthly_data.get("averageHighTemperature", 0.0)), # 91.0,
+      "average_low_temperature":  float(monthly_data.get("averageLowTemperature", 0.0)),  # 76.0,
+      "average_mid_temperature":  float(monthly_data.get("averageMidTemperature", 0.0)),  # 83.0,
+      "average_high_humidity":    float(monthly_data.get("averageHighHumidity", 0.0)),    # 96.0,
+      "average_low_humidity":     float(monthly_data.get("averageLowHumidity", 0.0)),     # 63.0,
+      "average_mid_humidity":     float(monthly_data.get("averageMidHumidity", 0.0)),     # 81.0,
+      "on_peak_kwh":              int(monthly_data.get("onPeakKwh", 0)),                  # 0,
+      "off_peak_kwh":             int(monthly_data.get("offPeakKwh", 0)),                 # 0,
+      "net_delivered":            int(monthly_data.get("netDelivered", 0)),               # 1243,
+      "net_received":             int(monthly_data.get("netReceived", 0)),                # 522,
+      "meter_number":             monthly_data.get("meterNumber", ""),                    # "KCD075N",
+      "meter_type":               monthly_data.get("meterType", ""),                      # "Y",
+      "reading":                  int(monthly_data.get("reading", 0)),                    # 26220,
+      "net_delivered_reading":    int(monthly_data.get("netDeliveredReading", 0)),        # 26220,
+      "net_received_reading":     int(monthly_data.get("netReceivedReading", 0)),         # 13539
+    }
 
   async def _build_daily_usage(self, daily_usage_data):
     read_time = datetime.fromisoformat(daily_usage_data["readTime"])
